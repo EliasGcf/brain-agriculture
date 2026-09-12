@@ -2,6 +2,7 @@ import { EntityValidationError } from '@core/errors/common/entity-validation-err
 import { UniqueEntityID } from '@core/entities/unique-entity-id';
 import { Document } from '@modules/producers/domain/value-objects/document';
 import { Producer } from '@modules/producers/domain/entities/producer';
+import { makeProducer } from '@test/factories/make-producer.factory';
 
 describe('Producer', () => {
   it('should be able to create a producer with a valid name and document', () => {
@@ -32,5 +33,22 @@ describe('Producer', () => {
         id,
       ).id,
     ).toBe(id);
+  });
+
+  it('should be able to create a producer with a creation date', () => {
+    const createdAt = new Date('2026-01-01T00:00:00.000Z');
+    const producer = makeProducer({ createdAt });
+
+    expect(producer.createdAt).toBe(createdAt);
+  });
+
+  it('should be able to update a producer while preserving its creation date', () => {
+    const createdAt = new Date('2026-01-01T00:00:00.000Z');
+    const producer = makeProducer({ createdAt });
+
+    producer.update({ name: 'Maria Souza' });
+
+    expect(producer.name).toBe('Maria Souza');
+    expect(producer.createdAt).toBe(createdAt);
   });
 });
