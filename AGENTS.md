@@ -11,3 +11,7 @@ Use the five canonical triage labels. Before triaging, read `docs/agents/triage-
 ### Domain docs
 
 This repo uses a multi-context layout for frontend and backend. Before exploring the codebase, read `docs/agents/domain.md`.
+
+### Testing
+
+When creating or modifying tests, read `docs/agents/testing.md` and follow its test naming convention.

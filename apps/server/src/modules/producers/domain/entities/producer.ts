@@ -11,7 +11,7 @@ const schema = z.object({
 type Schema = typeof schema
 
 export class Producer extends Entity<Schema> {
-  static create(props: z.input<Schema>, id?: UniqueEntityID): Producer {
+  static create(props: z.input<Schema>, id?: UniqueEntityID) {
     return new Producer(Producer.parse(schema, props), id)
   }
 
