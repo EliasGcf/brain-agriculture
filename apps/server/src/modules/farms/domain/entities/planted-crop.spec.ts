@@ -1,4 +1,3 @@
-import { EntityValidationError } from '@core/errors/common/entity-validation-error';
 import { PlantedCrop } from './planted-crop';
 import { UniqueEntityID } from '@core/entities/unique-entity-id';
 
