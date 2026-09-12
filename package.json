@@ -1,0 +1,6 @@
+{
+  "name": "brain-agriculture",
+  "private": true,
+  "type": "commonjs",
+  "workspaces": ["apps/*"]
+}
