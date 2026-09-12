@@ -12,6 +12,7 @@
         "@nestjs/common": "^12.0.1",
         "@nestjs/core": "^12.0.1",
         "@nestjs/platform-express": "^12.0.1",
+        "cpf-cnpj-validator": "^2.1.2",
         "reflect-metadata": "^0.2.2",
         "rxjs": "^7.8.1",
         "zod": "^4.6.2",
@@ -604,6 +605,8 @@
     "cookiejar": ["cookiejar@2.1.4", "", {}, "sha512-LDx6oHrK+PhzLKJU9j5S7/Y3jM/mUHvD/DeI1WQmJn652iPC5Y4TBzC9l+5OMOXlyTTA+SmVUPm0HQUwpD5Jqw=="],
 
     "cors": ["cors@2.8.6", "", { "dependencies": { "object-assign": "^4", "vary": "^1" } }, "sha512-tJtZBBHA6vjIAaF6EnIaq6laBBP9aq/Y3ouVJjEfoHbRBcHBAHYcMh/w8LDrk2PvIMMq8gmopa5D4V8RmbrxGw=="],
+
+    "cpf-cnpj-validator": ["cpf-cnpj-validator@2.1.2", "", { "peerDependencies": { "@angular/forms": ">=15", "class-validator": "^0.14.0 || ^0.15.0", "joi": "^17.0.0", "reflect-metadata": "^0.2.0", "yup": "^1.0.0", "zod": "^3.22.0 || ^4.0.0" }, "optionalPeers": ["@angular/forms", "class-validator", "joi", "reflect-metadata", "yup", "zod"] }, "sha512-JhU4oUhZRugvDZvWBSsQQHNHbWcjc5VW4BlmaKfChm7ddMSh/Ixv2iHM0uFNx3hN3NYgfVgVNl5MbkjNr5tgyA=="],
 
     "create-require": ["create-require@1.1.1", "", {}, "sha512-dcKFX3jn0MpIaXjisoRvexIJVEKzaq7z2rZKxf+MSr9TkdmHmsU4m2lcLojrj/FHl8mk5VxMmYA+ftRkP/3oKQ=="],
 
