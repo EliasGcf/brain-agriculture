@@ -1,23 +1,23 @@
 import { ResourceNotFoundError } from '@core/errors/common/resource-not-found-error';
 import { makeFarm } from '@test/factories/make-farm.factory';
-import { InMemoryFarmRepository } from '@test/repositories/in-memory-farm-repository';
-import { InMemoryHarvestRepository } from '@test/repositories/in-memory-harvest-repository';
-import { InMemoryPlantedCropRepository } from '@test/repositories/in-memory-planted-crop-repository';
+import { InMemoryFarmsRepository } from '@test/repositories/in-memory-farms.repository';
+import { InMemoryHarvestsRepository } from '@test/repositories/in-memory-harvests.repository';
+import { InMemoryPlantedCropsRepository } from '@test/repositories/in-memory-planted-crops.repository';
 import { GetFarmByIdUseCase } from './get-farm-by-id.use-case';
 
 describe('GetFarmByIdUseCase', () => {
-  let farmRepository: InMemoryFarmRepository;
+  let farmsRepository: InMemoryFarmsRepository;
   let useCase: GetFarmByIdUseCase;
 
   beforeEach(() => {
-    farmRepository = new InMemoryFarmRepository(
-      new InMemoryHarvestRepository(new InMemoryPlantedCropRepository()),
+    farmsRepository = new InMemoryFarmsRepository(
+      new InMemoryHarvestsRepository(new InMemoryPlantedCropsRepository()),
     );
-    useCase = new GetFarmByIdUseCase(farmRepository);
+    useCase = new GetFarmByIdUseCase(farmsRepository);
   });
 
   it('should be able to get a farm by id', async () => {
-    const farm = await farmRepository.save(makeFarm());
+    const farm = await farmsRepository.save(makeFarm());
     await expect(useCase.execute({ id: farm.id.toString() })).resolves.toEqual(farm);
   });
 

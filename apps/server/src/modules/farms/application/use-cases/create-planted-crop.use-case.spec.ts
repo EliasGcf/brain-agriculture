@@ -1,22 +1,22 @@
 import { ResourceNotFoundError } from '@core/errors/common/resource-not-found-error';
 import { makeHarvest } from '@test/factories/make-harvest.factory';
-import { InMemoryHarvestRepository } from '@test/repositories/in-memory-harvest-repository';
-import { InMemoryPlantedCropRepository } from '@test/repositories/in-memory-planted-crop-repository';
+import { InMemoryHarvestsRepository } from '@test/repositories/in-memory-harvests.repository';
+import { InMemoryPlantedCropsRepository } from '@test/repositories/in-memory-planted-crops.repository';
 import { CreatePlantedCropUseCase } from './create-planted-crop.use-case';
 
 describe('CreatePlantedCropUseCase', () => {
-  let harvestRepository: InMemoryHarvestRepository;
-  let plantedCropRepository: InMemoryPlantedCropRepository;
+  let harvestsRepository: InMemoryHarvestsRepository;
+  let plantedCropsRepository: InMemoryPlantedCropsRepository;
   let useCase: CreatePlantedCropUseCase;
 
   beforeEach(() => {
-    plantedCropRepository = new InMemoryPlantedCropRepository();
-    harvestRepository = new InMemoryHarvestRepository(plantedCropRepository);
-    useCase = new CreatePlantedCropUseCase(plantedCropRepository, harvestRepository);
+    plantedCropsRepository = new InMemoryPlantedCropsRepository();
+    harvestsRepository = new InMemoryHarvestsRepository(plantedCropsRepository);
+    useCase = new CreatePlantedCropUseCase(plantedCropsRepository, harvestsRepository);
   });
 
   it('should be able to create a planted crop for an existing harvest', async () => {
-    const harvest = await harvestRepository.save(makeHarvest({ farmId: 'farm-1' }));
+    const harvest = await harvestsRepository.save(makeHarvest({ farmId: 'farm-1' }));
 
     const crop = await useCase.execute({
       name: 'Soja',
@@ -25,7 +25,7 @@ describe('CreatePlantedCropUseCase', () => {
 
     expect(crop.name).toBe('Soja');
     expect(crop.harvestId).toBe(harvest.id.toString());
-    const persisted = await plantedCropRepository.findById(crop.id.toString());
+    const persisted = await plantedCropsRepository.findById(crop.id.toString());
     expect(persisted?.name).toBe('Soja');
     expect(persisted?.harvestId).toBe(harvest.id.toString());
   });

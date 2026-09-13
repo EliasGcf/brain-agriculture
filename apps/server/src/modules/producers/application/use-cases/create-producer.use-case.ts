@@ -1,6 +1,6 @@
 import { Document } from '@modules/producers/domain/value-objects/document';
 import { Producer } from '@modules/producers/domain/entities/producer';
-import { ProducerRepository } from '@modules/producers/domain/repositories/producer-repository';
+import { ProducersRepository } from '@modules/producers/domain/repositories/producers.repository';
 import { DocumentAlreadyUsedError } from '../errors/document-already-used-error';
 
 export interface Params {
@@ -9,7 +9,7 @@ export interface Params {
 }
 
 export class CreateProducerUseCase {
-  constructor(private readonly repository: ProducerRepository) {}
+  constructor(private readonly repository: ProducersRepository) {}
 
   async execute(params: Params): Promise<Producer> {
     const document = Document.create(params.document);

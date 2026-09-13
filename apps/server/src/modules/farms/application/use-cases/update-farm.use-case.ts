@@ -1,8 +1,8 @@
 import { ResourceNotFoundError } from '@core/errors/common/resource-not-found-error';
 import { Farm } from '@modules/farms/domain/entities/farm';
 import { Area } from '@modules/farms/domain/value-objects/area';
-import { FarmRepository } from '@modules/farms/domain/repositories/farm-repository';
-import { ProducerRepository } from '@modules/producers/domain/repositories/producer-repository';
+import { FarmsRepository } from '@modules/farms/domain/repositories/farms.repository';
+import { ProducersRepository } from '@modules/producers/domain/repositories/producers.repository';
 
 export type UpdateFarmParams = {
   id: string;
@@ -17,15 +17,15 @@ export type UpdateFarmParams = {
 
 export class UpdateFarmUseCase {
   constructor(
-    private readonly farmRepository: FarmRepository,
-    private readonly producerRepository: ProducerRepository,
+    private readonly farmsRepository: FarmsRepository,
+    private readonly producersRepository: ProducersRepository,
   ) {}
   async execute(params: UpdateFarmParams): Promise<Farm> {
-    const farm = await this.farmRepository.findById(params.id);
+    const farm = await this.farmsRepository.findById(params.id);
     if (!farm) throw new ResourceNotFoundError('Farm not found');
 
     if (params.producerId !== undefined && params.producerId !== farm.producerId) {
-      const producer = await this.producerRepository.findById(params.producerId);
+      const producer = await this.producersRepository.findById(params.producerId);
       if (!producer) throw new ResourceNotFoundError('Producer not found');
     }
 
@@ -48,7 +48,7 @@ export class UpdateFarmUseCase {
 
     farm.update(toUpdate);
 
-    await this.farmRepository.save(farm);
+    await this.farmsRepository.save(farm);
 
     return farm;
   }

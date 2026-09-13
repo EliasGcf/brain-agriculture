@@ -1,22 +1,22 @@
 import { ResourceNotFoundError } from '@core/errors/common/resource-not-found-error';
 import { makeHarvest } from '@test/factories/make-harvest.factory';
-import { InMemoryHarvestRepository } from '@test/repositories/in-memory-harvest-repository';
-import { InMemoryPlantedCropRepository } from '@test/repositories/in-memory-planted-crop-repository';
+import { InMemoryHarvestsRepository } from '@test/repositories/in-memory-harvests.repository';
+import { InMemoryPlantedCropsRepository } from '@test/repositories/in-memory-planted-crops.repository';
 import { GetHarvestByIdUseCase } from './get-harvest-by-id.use-case';
 
 describe('GetHarvestByIdUseCase', () => {
-  let harvestRepository: InMemoryHarvestRepository;
+  let harvestsRepository: InMemoryHarvestsRepository;
   let useCase: GetHarvestByIdUseCase;
 
   beforeEach(() => {
-    harvestRepository = new InMemoryHarvestRepository(
-      new InMemoryPlantedCropRepository(),
+    harvestsRepository = new InMemoryHarvestsRepository(
+      new InMemoryPlantedCropsRepository(),
     );
-    useCase = new GetHarvestByIdUseCase(harvestRepository);
+    useCase = new GetHarvestByIdUseCase(harvestsRepository);
   });
 
   it('should be able to get a harvest by id', async () => {
-    const harvest = await harvestRepository.save(makeHarvest());
+    const harvest = await harvestsRepository.save(makeHarvest());
     await expect(useCase.execute({ id: harvest.id.toString() })).resolves.toEqual(
       harvest,
     );

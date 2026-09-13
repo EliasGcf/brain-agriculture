@@ -1,14 +1,14 @@
 import { ResourceNotFoundError } from '@core/errors/common/resource-not-found-error';
-import { InMemoryProducerRepository } from '@test/repositories/in-memory-producer-repository';
+import { InMemoryProducersRepository } from '@test/repositories/in-memory-producers.repository';
 import { makeProducer } from '@test/factories/make-producer.factory';
 import { GetProducerByIdUseCase } from './get-producer-by-id.use-case';
 
 describe('GetProducerByIdUseCase', () => {
-  let repository: InMemoryProducerRepository;
+  let repository: InMemoryProducersRepository;
   let useCase: GetProducerByIdUseCase;
 
   beforeEach(() => {
-    repository = new InMemoryProducerRepository();
+    repository = new InMemoryProducersRepository();
     useCase = new GetProducerByIdUseCase(repository);
   });
 

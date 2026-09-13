@@ -41,3 +41,15 @@ _Avoid_: Reserve, preserved area
 **Other uses**:
 The part of a farm's total area that is not classified as arable area or vegetation area.
 _Avoid_: Unused area
+
+## Resolved domain decisions
+
+- Internal identifiers are UUIDs.
+- A producer cannot be deleted while it owns properties.
+- Deleting a farm deletes its harvests and planted crops transactionally.
+- Harvest names are unique within a farm using the domain-normalized name.
+- Planted crop names may repeat within a harvest.
+- A farm may be transferred to another existing producer by updating its owner relationship.
+- Deletion is physical in this version; a future historical/audit requirement should favor soft-delete.
+- User accounts and authentication are outside the initial domain scope.
+- Main domain records keep creation and last-update timestamps; historical auditing is outside this version.

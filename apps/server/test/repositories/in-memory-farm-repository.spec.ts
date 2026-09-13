@@ -2,28 +2,28 @@ import { makePlantedCrop } from '../factories/make-planted-crop.factory';
 import { Farm } from '@modules/farms/domain/entities/farm';
 import { makeFarm } from '../factories/make-farm.factory';
 import { makeHarvest } from '../factories/make-harvest.factory';
-import { InMemoryFarmRepository } from './in-memory-farm-repository';
-import { InMemoryHarvestRepository } from './in-memory-harvest-repository';
-import { InMemoryPlantedCropRepository } from './in-memory-planted-crop-repository';
+import { InMemoryFarmsRepository } from './in-memory-farms.repository';
+import { InMemoryHarvestsRepository } from './in-memory-harvests.repository';
+import { InMemoryPlantedCropsRepository } from './in-memory-planted-crops.repository';
 
-describe('InMemoryFarmRepository', () => {
-  let plantedCropRepository: InMemoryPlantedCropRepository;
-  let harvestRepository: InMemoryHarvestRepository;
-  let farmRepository: InMemoryFarmRepository;
+describe('InMemoryFarmsRepository', () => {
+  let plantedCropsRepository: InMemoryPlantedCropsRepository;
+  let harvestsRepository: InMemoryHarvestsRepository;
+  let farmsRepository: InMemoryFarmsRepository;
 
   beforeEach(() => {
-    plantedCropRepository = new InMemoryPlantedCropRepository();
-    harvestRepository = new InMemoryHarvestRepository(plantedCropRepository);
-    farmRepository = new InMemoryFarmRepository(harvestRepository);
+    plantedCropsRepository = new InMemoryPlantedCropsRepository();
+    harvestsRepository = new InMemoryHarvestsRepository(plantedCropsRepository);
+    farmsRepository = new InMemoryFarmsRepository(harvestsRepository);
   });
 
   it('should be able to save and find a farm by id', async () => {
-    const farm = await farmRepository.save(makeFarm());
-    await expect(farmRepository.findById(farm.id.toString())).resolves.toBe(farm);
+    const farm = await farmsRepository.save(makeFarm());
+    await expect(farmsRepository.findById(farm.id.toString())).resolves.toBe(farm);
   });
 
   it('should be able to replace a farm when saving an existing id', async () => {
-    const farm = await farmRepository.save(makeFarm());
+    const farm = await farmsRepository.save(makeFarm());
     const replacement = Farm.create(
       {
         name: 'Updated farm',
@@ -38,27 +38,27 @@ describe('InMemoryFarmRepository', () => {
       farm.id,
     );
 
-    await farmRepository.save(replacement);
+    await farmsRepository.save(replacement);
 
-    const persisted = await farmRepository.findById(farm.id.toString());
+    const persisted = await farmsRepository.findById(farm.id.toString());
     expect(persisted?.name).toBe('Updated farm');
-    expect(farmRepository.items).toEqual([replacement]);
+    expect(farmsRepository.items).toEqual([replacement]);
   });
 
   it('should be able to cascade farm deletion to its harvests and planted crops', async () => {
     const farm = makeFarm();
     const harvest = makeHarvest({ farmId: farm.id.toString() });
 
-    await farmRepository.save(farm);
-    await harvestRepository.save(harvest);
-    const crop = await plantedCropRepository.save(
+    await farmsRepository.save(farm);
+    await harvestsRepository.save(harvest);
+    const crop = await plantedCropsRepository.save(
       makePlantedCrop({ harvestId: harvest.id.toString() }),
     );
 
-    await farmRepository.deleteById(farm.id.toString());
+    await farmsRepository.deleteById(farm.id.toString());
 
-    expect(farmRepository.items).toHaveLength(0);
-    expect(harvestRepository.items).toHaveLength(0);
-    await expect(plantedCropRepository.findById(crop.id.toString())).resolves.toBeNull();
+    expect(farmsRepository.items).toHaveLength(0);
+    expect(harvestsRepository.items).toHaveLength(0);
+    await expect(plantedCropsRepository.findById(crop.id.toString())).resolves.toBeNull();
   });
 });

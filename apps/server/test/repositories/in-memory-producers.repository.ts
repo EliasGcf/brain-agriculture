@@ -1,11 +1,11 @@
 import { PaginatedResult } from '@core/dto/paginated-result';
 import {
   FindManyProducersParams,
-  ProducerRepository,
-} from '@modules/producers/domain/repositories/producer-repository';
+  ProducersRepository,
+} from '@modules/producers/domain/repositories/producers.repository';
 import { Producer } from '@modules/producers/domain/entities/producer';
 
-export class InMemoryProducerRepository implements ProducerRepository {
+export class InMemoryProducersRepository implements ProducersRepository {
   public items: Producer[] = [];
 
   async findById(id: string): Promise<Producer | null> {

@@ -21,6 +21,7 @@
     "strictPropertyInitialization": false,
     "paths": {
       "@core/*": ["./src/core/*"],
+      "@infra/*": ["./src/infra/*"],
       "@modules/*": ["./src/modules/*"],
       "@test/*": ["./test/*"],
     }

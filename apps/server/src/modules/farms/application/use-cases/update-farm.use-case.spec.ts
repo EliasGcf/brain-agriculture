@@ -3,29 +3,31 @@ import { Area } from '@modules/farms/domain/value-objects/area';
 import { ResourceNotFoundError } from '@core/errors/common/resource-not-found-error';
 import { makeProducer } from '@test/factories/make-producer.factory';
 import { makeFarm } from '@test/factories/make-farm.factory';
-import { InMemoryProducerRepository } from '@test/repositories/in-memory-producer-repository';
-import { InMemoryFarmRepository } from '@test/repositories/in-memory-farm-repository';
-import { InMemoryHarvestRepository } from '@test/repositories/in-memory-harvest-repository';
-import { InMemoryPlantedCropRepository } from '@test/repositories/in-memory-planted-crop-repository';
+import { InMemoryProducersRepository } from '@test/repositories/in-memory-producers.repository';
+import { InMemoryFarmsRepository } from '@test/repositories/in-memory-farms.repository';
+import { InMemoryHarvestsRepository } from '@test/repositories/in-memory-harvests.repository';
+import { InMemoryPlantedCropsRepository } from '@test/repositories/in-memory-planted-crops.repository';
 import { UpdateFarmUseCase } from './update-farm.use-case';
 
 describe('UpdateFarmUseCase', () => {
-  let producerRepository: InMemoryProducerRepository;
-  let farmRepository: InMemoryFarmRepository;
+  let producersRepository: InMemoryProducersRepository;
+  let farmsRepository: InMemoryFarmsRepository;
   let useCase: UpdateFarmUseCase;
 
   beforeEach(() => {
-    producerRepository = new InMemoryProducerRepository();
-    farmRepository = new InMemoryFarmRepository(
-      new InMemoryHarvestRepository(new InMemoryPlantedCropRepository()),
+    producersRepository = new InMemoryProducersRepository();
+    farmsRepository = new InMemoryFarmsRepository(
+      new InMemoryHarvestsRepository(new InMemoryPlantedCropsRepository()),
     );
-    useCase = new UpdateFarmUseCase(farmRepository, producerRepository);
+    useCase = new UpdateFarmUseCase(farmsRepository, producersRepository);
   });
 
   it('should be able to update a farm while preserving identity', async () => {
-    const first = await producerRepository.save(makeProducer());
-    const second = await producerRepository.save(makeProducer());
-    const farm = await farmRepository.save(makeFarm({ producerId: first.id.toString() }));
+    const first = await producersRepository.save(makeProducer());
+    const second = await producersRepository.save(makeProducer());
+    const farm = await farmsRepository.save(
+      makeFarm({ producerId: first.id.toString() }),
+    );
 
     const result = await useCase.execute({
       id: farm.id.toString(),
@@ -48,11 +50,11 @@ describe('UpdateFarmUseCase', () => {
     expect(result.arableArea.value).toBe(120);
     expect(result.vegetationArea.value).toBe(50);
 
-    await expect(farmRepository.findById(farm.id.toString())).resolves.toEqual(result);
+    await expect(farmsRepository.findById(farm.id.toString())).resolves.toEqual(result);
   });
 
   it('should not be able to update a farm to a missing producer', async () => {
-    const farm = await farmRepository.save(makeFarm({ producerId: 'producer-1' }));
+    const farm = await farmsRepository.save(makeFarm({ producerId: 'producer-1' }));
     await expect(
       useCase.execute({
         id: farm.id.toString(),
@@ -64,7 +66,7 @@ describe('UpdateFarmUseCase', () => {
   it.each(['arableArea', 'vegetationArea'] as const)(
     'should be able to set %s to zero while preserving omitted fields',
     async (field) => {
-      const farm = await farmRepository.save(
+      const farm = await farmsRepository.save(
         makeFarm({
           totalArea: Area.create(100),
           arableArea: Area.create(60),
@@ -72,7 +74,7 @@ describe('UpdateFarmUseCase', () => {
         }),
       );
       const result = await useCase.execute({ id: farm.id.toString(), [field]: 0 });
-      const persisted = await farmRepository.findById(farm.id.toString());
+      const persisted = await farmsRepository.findById(farm.id.toString());
 
       expect(result[field].value).toBe(0);
       expect(persisted?.[field].value).toBe(0);
@@ -89,7 +91,7 @@ describe('UpdateFarmUseCase', () => {
   );
 
   it('should be able to reduce total area together with allocated areas', async () => {
-    const farm = await farmRepository.save(
+    const farm = await farmsRepository.save(
       makeFarm({
         totalArea: Area.create(100),
         arableArea: Area.create(60),
@@ -104,7 +106,7 @@ describe('UpdateFarmUseCase', () => {
       vegetationArea: 0,
     });
 
-    const persisted = await farmRepository.findById(farm.id.toString());
+    const persisted = await farmsRepository.findById(farm.id.toString());
     expect(persisted?.totalArea.value).toBe(10);
     expect(persisted?.arableArea.value).toBe(0);
     expect(persisted?.vegetationArea.value).toBe(0);
@@ -117,7 +119,7 @@ describe('UpdateFarmUseCase', () => {
     { field: 'state', patch: { state: '' } },
     { field: 'allocated areas exceeding the total', patch: { arableArea: 90 } },
   ])('should not be able to persist invalid $field', async ({ patch }) => {
-    const farm = await farmRepository.save(
+    const farm = await farmsRepository.save(
       makeFarm({
         totalArea: Area.create(100),
         arableArea: Area.create(60),
@@ -128,7 +130,7 @@ describe('UpdateFarmUseCase', () => {
       useCase.execute({ id: farm.id.toString(), ...patch }),
     ).rejects.toBeInstanceOf(EntityValidationError);
 
-    const persisted = await farmRepository.findById(farm.id.toString());
+    const persisted = await farmsRepository.findById(farm.id.toString());
     expect(persisted?.name).toBe(farm.name);
     expect(persisted?.city).toBe(farm.city);
     expect(persisted?.state).toBe(farm.state);

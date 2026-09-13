@@ -1,11 +1,11 @@
-import { InMemoryProducerRepository } from './in-memory-producer-repository';
+import { InMemoryProducersRepository } from './in-memory-producers.repository';
 import { makeProducer } from '../factories/make-producer.factory';
 
-describe('InMemoryProducerRepository', () => {
-  let repository: InMemoryProducerRepository;
+describe('InMemoryProducersRepository', () => {
+  let repository: InMemoryProducersRepository;
 
   beforeEach(() => {
-    repository = new InMemoryProducerRepository();
+    repository = new InMemoryProducersRepository();
   });
 
   it('should be able to save and find a producer by id', async () => {

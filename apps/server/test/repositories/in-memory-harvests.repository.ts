@@ -1,11 +1,11 @@
-import { HarvestRepository } from '@modules/farms/domain/repositories/harvest-repository';
+import { HarvestsRepository } from '@modules/farms/domain/repositories/harvests.repository';
 import { Harvest } from '@modules/farms/domain/entities/harvest';
-import { InMemoryPlantedCropRepository } from './in-memory-planted-crop-repository';
+import { InMemoryPlantedCropsRepository } from './in-memory-planted-crops.repository';
 
-export class InMemoryHarvestRepository implements HarvestRepository {
+export class InMemoryHarvestsRepository implements HarvestsRepository {
   public items: Harvest[] = [];
 
-  constructor(private readonly plantedCropRepository: InMemoryPlantedCropRepository) {}
+  constructor(private readonly plantedCropsRepository: InMemoryPlantedCropsRepository) {}
 
   async findById(id: string) {
     return this.items.find((item) => item.id.toString() === id) ?? null;
@@ -23,9 +23,9 @@ export class InMemoryHarvestRepository implements HarvestRepository {
   }
 
   async deleteById(id: string) {
-    const crops = await this.plantedCropRepository.findManyByHarvestId(id);
+    const crops = await this.plantedCropsRepository.findManyByHarvestId(id);
     await Promise.all(
-      crops.map((crop) => this.plantedCropRepository.deleteById(crop.id.toString())),
+      crops.map((crop) => this.plantedCropsRepository.deleteById(crop.id.toString())),
     );
     this.items = this.items.filter((item) => item.id.toString() !== id);
   }

@@ -1,19 +1,19 @@
 import { ResourceNotFoundError } from '@core/errors/common/resource-not-found-error';
 import { makePlantedCrop } from '@test/factories/make-planted-crop.factory';
-import { InMemoryPlantedCropRepository } from '@test/repositories/in-memory-planted-crop-repository';
+import { InMemoryPlantedCropsRepository } from '@test/repositories/in-memory-planted-crops.repository';
 import { GetPlantedCropByIdUseCase } from './get-planted-crop-by-id.use-case';
 
 describe('GetPlantedCropByIdUseCase', () => {
-  let plantedCropRepository: InMemoryPlantedCropRepository;
+  let plantedCropsRepository: InMemoryPlantedCropsRepository;
   let useCase: GetPlantedCropByIdUseCase;
 
   beforeEach(() => {
-    plantedCropRepository = new InMemoryPlantedCropRepository();
-    useCase = new GetPlantedCropByIdUseCase(plantedCropRepository);
+    plantedCropsRepository = new InMemoryPlantedCropsRepository();
+    useCase = new GetPlantedCropByIdUseCase(plantedCropsRepository);
   });
 
   it('should be able to get a planted crop by id', async () => {
-    const crop = await plantedCropRepository.save(makePlantedCrop());
+    const crop = await plantedCropsRepository.save(makePlantedCrop());
     await expect(useCase.execute({ id: crop.id.toString() })).resolves.toEqual(crop);
   });
 

@@ -1,31 +1,31 @@
 import { ResourceNotFoundError } from '@core/errors/common/resource-not-found-error';
 import { makeFarm } from '@test/factories/make-farm.factory';
-import { InMemoryFarmRepository } from '@test/repositories/in-memory-farm-repository';
-import { InMemoryHarvestRepository } from '@test/repositories/in-memory-harvest-repository';
-import { InMemoryPlantedCropRepository } from '@test/repositories/in-memory-planted-crop-repository';
+import { InMemoryFarmsRepository } from '@test/repositories/in-memory-farms.repository';
+import { InMemoryHarvestsRepository } from '@test/repositories/in-memory-harvests.repository';
+import { InMemoryPlantedCropsRepository } from '@test/repositories/in-memory-planted-crops.repository';
 import { CreateHarvestUseCase } from './create-harvest.use-case';
 
 describe('CreateHarvestUseCase', () => {
-  let farmRepository: InMemoryFarmRepository;
-  let harvestRepository: InMemoryHarvestRepository;
+  let farmsRepository: InMemoryFarmsRepository;
+  let harvestsRepository: InMemoryHarvestsRepository;
   let useCase: CreateHarvestUseCase;
 
   beforeEach(() => {
-    const plantedCropRepository = new InMemoryPlantedCropRepository();
-    harvestRepository = new InMemoryHarvestRepository(plantedCropRepository);
-    farmRepository = new InMemoryFarmRepository(harvestRepository);
-    useCase = new CreateHarvestUseCase(harvestRepository, farmRepository);
+    const plantedCropsRepository = new InMemoryPlantedCropsRepository();
+    harvestsRepository = new InMemoryHarvestsRepository(plantedCropsRepository);
+    farmsRepository = new InMemoryFarmsRepository(harvestsRepository);
+    useCase = new CreateHarvestUseCase(harvestsRepository, farmsRepository);
   });
 
   it('should be able to create a harvest for an existing farm', async () => {
-    const farm = await farmRepository.save(makeFarm({ producerId: 'producer-1' }));
+    const farm = await farmsRepository.save(makeFarm({ producerId: 'producer-1' }));
     const harvest = await useCase.execute({
       name: 'Safra 2026',
       farmId: farm.id.toString(),
     });
     expect(harvest.name).toBe('Safra 2026');
     expect(harvest.farmId).toBe(farm.id.toString());
-    const persisted = await harvestRepository.findById(harvest.id.toString());
+    const persisted = await harvestsRepository.findById(harvest.id.toString());
     expect(persisted?.name).toBe('Safra 2026');
     expect(persisted?.farmId).toBe(farm.id.toString());
   });

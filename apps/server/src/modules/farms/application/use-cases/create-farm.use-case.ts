@@ -1,7 +1,7 @@
-import { ProducerRepository } from '@modules/producers/domain/repositories/producer-repository';
+import { ProducersRepository } from '@modules/producers/domain/repositories/producers.repository';
 import { Farm } from '@modules/farms/domain/entities/farm';
 import { Area } from '@modules/farms/domain/value-objects/area';
-import { FarmRepository } from '@modules/farms/domain/repositories/farm-repository';
+import { FarmsRepository } from '@modules/farms/domain/repositories/farms.repository';
 import { ResourceNotFoundError } from '@core/errors/common/resource-not-found-error';
 
 interface Params {
@@ -16,12 +16,12 @@ interface Params {
 
 export class CreateFarmUseCase {
   constructor(
-    private readonly farmRepository: FarmRepository,
-    private readonly producerRepository: ProducerRepository,
+    private readonly farmsRepository: FarmsRepository,
+    private readonly producersRepository: ProducersRepository,
   ) {}
 
   async execute(params: Params) {
-    const producer = await this.producerRepository.findById(params.producerId);
+    const producer = await this.producersRepository.findById(params.producerId);
     if (!producer) throw new ResourceNotFoundError('Producer not found');
 
     const farm = Farm.create({
@@ -34,7 +34,7 @@ export class CreateFarmUseCase {
       vegetationArea: Area.create(params.vegetationArea),
     });
 
-    await this.farmRepository.save(farm);
+    await this.farmsRepository.save(farm);
 
     return farm;
   }

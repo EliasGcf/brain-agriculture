@@ -1,4 +1,4 @@
-import { InMemoryProducerRepository } from '@test/repositories/in-memory-producer-repository';
+import { InMemoryProducersRepository } from '@test/repositories/in-memory-producers.repository';
 import { DocumentAlreadyUsedError } from '../errors/document-already-used-error';
 import { CreateProducerUseCase } from './create-producer.use-case';
 import { makeProducer } from '@test/factories/make-producer.factory';
@@ -6,11 +6,11 @@ import { cnpj } from 'cpf-cnpj-validator';
 import { DocumentValidationError } from '../../domain/errors/document-validation-error';
 
 describe('CreateProducerUseCase', () => {
-  let repository: InMemoryProducerRepository;
+  let repository: InMemoryProducersRepository;
   let useCase: CreateProducerUseCase;
 
   beforeEach(() => {
-    repository = new InMemoryProducerRepository();
+    repository = new InMemoryProducersRepository();
     useCase = new CreateProducerUseCase(repository);
   });
 

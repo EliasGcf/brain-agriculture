@@ -1,7 +1,7 @@
 import { ResourceNotFoundError } from '@core/errors/common/resource-not-found-error';
 import { Harvest } from '@modules/farms/domain/entities/harvest';
-import { FarmRepository } from '@modules/farms/domain/repositories/farm-repository';
-import { HarvestRepository } from '@modules/farms/domain/repositories/harvest-repository';
+import { FarmsRepository } from '@modules/farms/domain/repositories/farms.repository';
+import { HarvestsRepository } from '@modules/farms/domain/repositories/harvests.repository';
 
 interface Params {
   name: string;
@@ -10,16 +10,16 @@ interface Params {
 
 export class CreateHarvestUseCase {
   constructor(
-    private readonly harvestRepository: HarvestRepository,
-    private readonly farmRepository: FarmRepository,
+    private readonly harvestsRepository: HarvestsRepository,
+    private readonly farmsRepository: FarmsRepository,
   ) {}
   async execute(params: Params) {
-    const farm = await this.farmRepository.findById(params.farmId);
+    const farm = await this.farmsRepository.findById(params.farmId);
     if (!farm) throw new ResourceNotFoundError('Farm not found');
 
     const harvest = Harvest.create({ name: params.name, farmId: farm.id.toString() });
 
-    await this.harvestRepository.save(harvest);
+    await this.harvestsRepository.save(harvest);
 
     return harvest;
   }

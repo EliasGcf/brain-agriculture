@@ -1,17 +1,17 @@
 import { ResourceNotFoundError } from '@core/errors/common/resource-not-found-error';
-import { FarmRepository } from '@modules/farms/domain/repositories/farm-repository';
+import { FarmsRepository } from '@modules/farms/domain/repositories/farms.repository';
 
 interface Params {
   id: string;
 }
 
 export class DeleteFarmUseCase {
-  constructor(private readonly farmRepository: FarmRepository) {}
+  constructor(private readonly farmsRepository: FarmsRepository) {}
 
   async execute(params: Params): Promise<void> {
-    const farm = await this.farmRepository.findById(params.id);
+    const farm = await this.farmsRepository.findById(params.id);
     if (!farm) throw new ResourceNotFoundError('Farm not found');
 
-    await this.farmRepository.deleteById(params.id);
+    await this.farmsRepository.deleteById(params.id);
   }
 }

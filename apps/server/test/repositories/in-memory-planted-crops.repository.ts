@@ -1,7 +1,7 @@
-import { PlantedCropRepository } from '@modules/farms/domain/repositories/planted-crop-repository';
+import { PlantedCropsRepository } from '@modules/farms/domain/repositories/planted-crops.repository';
 import { PlantedCrop } from '@modules/farms/domain/entities/planted-crop';
 
-export class InMemoryPlantedCropRepository implements PlantedCropRepository {
+export class InMemoryPlantedCropsRepository implements PlantedCropsRepository {
   public items: PlantedCrop[] = [];
 
   async findById(id: string) {

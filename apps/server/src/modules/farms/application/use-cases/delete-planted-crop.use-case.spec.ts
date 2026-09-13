@@ -1,23 +1,23 @@
 import { ResourceNotFoundError } from '@core/errors/common/resource-not-found-error';
 import { makePlantedCrop } from '@test/factories/make-planted-crop.factory';
-import { InMemoryPlantedCropRepository } from '@test/repositories/in-memory-planted-crop-repository';
+import { InMemoryPlantedCropsRepository } from '@test/repositories/in-memory-planted-crops.repository';
 import { DeletePlantedCropUseCase } from './delete-planted-crop.use-case';
 
 describe('DeletePlantedCropUseCase', () => {
-  let plantedCropRepository: InMemoryPlantedCropRepository;
+  let plantedCropsRepository: InMemoryPlantedCropsRepository;
   let useCase: DeletePlantedCropUseCase;
 
   beforeEach(() => {
-    plantedCropRepository = new InMemoryPlantedCropRepository();
-    useCase = new DeletePlantedCropUseCase(plantedCropRepository);
+    plantedCropsRepository = new InMemoryPlantedCropsRepository();
+    useCase = new DeletePlantedCropUseCase(plantedCropsRepository);
   });
 
   it('should be able to delete a planted crop', async () => {
-    const crop = await plantedCropRepository.save(makePlantedCrop());
+    const crop = await plantedCropsRepository.save(makePlantedCrop());
 
     await useCase.execute({ id: crop.id.toString() });
 
-    await expect(plantedCropRepository.findById(crop.id.toString())).resolves.toBeNull();
+    await expect(plantedCropsRepository.findById(crop.id.toString())).resolves.toBeNull();
   });
 
   it('should not be able to delete a missing planted crop', async () => {

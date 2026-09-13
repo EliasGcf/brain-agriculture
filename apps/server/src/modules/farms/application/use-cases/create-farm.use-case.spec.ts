@@ -1,26 +1,26 @@
 import { ResourceNotFoundError } from '@core/errors/common/resource-not-found-error';
 import { makeProducer } from '@test/factories/make-producer.factory';
-import { InMemoryProducerRepository } from '@test/repositories/in-memory-producer-repository';
-import { InMemoryFarmRepository } from '@test/repositories/in-memory-farm-repository';
-import { InMemoryHarvestRepository } from '@test/repositories/in-memory-harvest-repository';
-import { InMemoryPlantedCropRepository } from '@test/repositories/in-memory-planted-crop-repository';
+import { InMemoryProducersRepository } from '@test/repositories/in-memory-producers.repository';
+import { InMemoryFarmsRepository } from '@test/repositories/in-memory-farms.repository';
+import { InMemoryHarvestsRepository } from '@test/repositories/in-memory-harvests.repository';
+import { InMemoryPlantedCropsRepository } from '@test/repositories/in-memory-planted-crops.repository';
 import { CreateFarmUseCase } from './create-farm.use-case';
 
 describe('CreateFarmUseCase', () => {
-  let producerRepository: InMemoryProducerRepository;
-  let farmRepository: InMemoryFarmRepository;
+  let producersRepository: InMemoryProducersRepository;
+  let farmsRepository: InMemoryFarmsRepository;
   let useCase: CreateFarmUseCase;
 
   beforeEach(() => {
-    producerRepository = new InMemoryProducerRepository();
-    farmRepository = new InMemoryFarmRepository(
-      new InMemoryHarvestRepository(new InMemoryPlantedCropRepository()),
+    producersRepository = new InMemoryProducersRepository();
+    farmsRepository = new InMemoryFarmsRepository(
+      new InMemoryHarvestsRepository(new InMemoryPlantedCropsRepository()),
     );
-    useCase = new CreateFarmUseCase(farmRepository, producerRepository);
+    useCase = new CreateFarmUseCase(farmsRepository, producersRepository);
   });
 
   it('should be able to create a farm for an existing producer', async () => {
-    const producer = await producerRepository.save(makeProducer());
+    const producer = await producersRepository.save(makeProducer());
     const farm = await useCase.execute({
       name: 'Fazenda Sol',
       producerId: producer.id.toString(),
@@ -30,7 +30,7 @@ describe('CreateFarmUseCase', () => {
       arableArea: 60,
       vegetationArea: 30,
     });
-    const persisted = await farmRepository.findById(farm.id.toString());
+    const persisted = await farmsRepository.findById(farm.id.toString());
     expect(persisted).not.toBeNull();
     for (const result of [farm, persisted!]) {
       expect(result.name).toBe('Fazenda Sol');

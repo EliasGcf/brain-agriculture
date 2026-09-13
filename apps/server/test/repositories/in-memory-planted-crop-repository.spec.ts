@@ -1,11 +1,11 @@
 import { makePlantedCrop } from '../factories/make-planted-crop.factory';
-import { InMemoryPlantedCropRepository } from './in-memory-planted-crop-repository';
+import { InMemoryPlantedCropsRepository } from './in-memory-planted-crops.repository';
 
-describe('InMemoryPlantedCropRepository', () => {
-  let repository: InMemoryPlantedCropRepository;
+describe('InMemoryPlantedCropsRepository', () => {
+  let repository: InMemoryPlantedCropsRepository;
 
   beforeEach(() => {
-    repository = new InMemoryPlantedCropRepository();
+    repository = new InMemoryPlantedCropsRepository();
   });
 
   it('should be able to save and find a planted crop by id', async () => {

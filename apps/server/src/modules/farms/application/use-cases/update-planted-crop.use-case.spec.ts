@@ -1,19 +1,19 @@
 import { makePlantedCrop } from '@test/factories/make-planted-crop.factory';
-import { InMemoryPlantedCropRepository } from '@test/repositories/in-memory-planted-crop-repository';
+import { InMemoryPlantedCropsRepository } from '@test/repositories/in-memory-planted-crops.repository';
 import { UpdatePlantedCropUseCase } from './update-planted-crop.use-case';
 import { ResourceNotFoundError } from '@core/errors/common/resource-not-found-error';
 
 describe('UpdatePlantedCropUseCase', () => {
-  let plantedCropRepository: InMemoryPlantedCropRepository;
+  let plantedCropsRepository: InMemoryPlantedCropsRepository;
   let useCase: UpdatePlantedCropUseCase;
 
   beforeEach(() => {
-    plantedCropRepository = new InMemoryPlantedCropRepository();
-    useCase = new UpdatePlantedCropUseCase(plantedCropRepository);
+    plantedCropsRepository = new InMemoryPlantedCropsRepository();
+    useCase = new UpdatePlantedCropUseCase(plantedCropsRepository);
   });
 
   it('should be able to update a planted crop name and preserve its parent', async () => {
-    const crop = await plantedCropRepository.save(makePlantedCrop());
+    const crop = await plantedCropsRepository.save(makePlantedCrop());
 
     const result = await useCase.execute({ id: crop.id.toString(), name: 'Milho' });
 
@@ -22,7 +22,7 @@ describe('UpdatePlantedCropUseCase', () => {
     expect(result.id).toBe(crop.id);
     expect(result.createdAt).toBe(crop.createdAt);
 
-    await expect(plantedCropRepository.findById(crop.id.toString())).resolves.toEqual(
+    await expect(plantedCropsRepository.findById(crop.id.toString())).resolves.toEqual(
       result,
     );
   });
@@ -34,9 +34,9 @@ describe('UpdatePlantedCropUseCase', () => {
   });
 
   it('should be able to preserve a planted crop when the name is omitted', async () => {
-    const crop = await plantedCropRepository.save(makePlantedCrop());
+    const crop = await plantedCropsRepository.save(makePlantedCrop());
     const result = await useCase.execute({ id: crop.id.toString() });
-    const persisted = await plantedCropRepository.findById(crop.id.toString());
+    const persisted = await plantedCropsRepository.findById(crop.id.toString());
 
     expect(result.name).toBe(crop.name);
     expect(result.id).toBe(crop.id);

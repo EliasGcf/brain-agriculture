@@ -1,13 +1,13 @@
-import { InMemoryProducerRepository } from '@test/repositories/in-memory-producer-repository';
+import { InMemoryProducersRepository } from '@test/repositories/in-memory-producers.repository';
 import { makeProducer } from '@test/factories/make-producer.factory';
 import { ListProducersUseCase } from './list-producers.use-case';
 
 describe('ListProducersUseCase', () => {
-  let repository: InMemoryProducerRepository;
+  let repository: InMemoryProducersRepository;
   let useCase: ListProducersUseCase;
 
   beforeEach(() => {
-    repository = new InMemoryProducerRepository();
+    repository = new InMemoryProducersRepository();
     useCase = new ListProducersUseCase(repository);
   });
 

@@ -1,16 +1,16 @@
 import { ResourceNotFoundError } from '@core/errors/common/resource-not-found-error';
 import { UpdateProducerUseCase } from './update-producer.use-case';
-import { InMemoryProducerRepository } from '@test/repositories/in-memory-producer-repository';
+import { InMemoryProducersRepository } from '@test/repositories/in-memory-producers.repository';
 import { makeProducer } from '@test/factories/make-producer.factory';
 import { DocumentAlreadyUsedError } from '../errors/document-already-used-error';
 import { DocumentValidationError } from '../../domain/errors/document-validation-error';
 
 describe('UpdateProducerUseCase', () => {
-  let repository: InMemoryProducerRepository;
+  let repository: InMemoryProducersRepository;
   let useCase: UpdateProducerUseCase;
 
   beforeEach(() => {
-    repository = new InMemoryProducerRepository();
+    repository = new InMemoryProducersRepository();
     useCase = new UpdateProducerUseCase(repository);
   });
 
