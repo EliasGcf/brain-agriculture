@@ -17,6 +17,10 @@ export class Producer extends Entity<Schema> {
     return new Producer(Producer.parse(schema, props), id);
   }
 
+  update(props: Partial<Pick<Input, 'name' | 'document'>>) {
+    this.props = Producer.parse(schema, { ...this.props, ...props });
+  }
+
   get name() {
     return this.props.name;
   }
@@ -27,9 +31,5 @@ export class Producer extends Entity<Schema> {
 
   get createdAt() {
     return this.props.createdAt;
-  }
-
-  update(props: Partial<Pick<Input, 'name' | 'document'>>) {
-    this.props = Producer.parse(schema, { ...this.props, ...props });
   }
 }

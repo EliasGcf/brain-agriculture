@@ -2,20 +2,25 @@ import { z } from 'zod';
 import { EntityValidationError } from '../errors/common/entity-validation-error';
 import { ValueObject } from './value-object';
 
-const schema = z.object({ value: z.string() });
+const schema = z.object({ value: z.string().trim() });
 
 class TestValueObject extends ValueObject<typeof schema> {
   constructor(props: z.input<typeof schema>) {
     super(TestValueObject.parse(schema, props));
   }
+
+  get value() {
+    return this.props.value;
+  }
 }
 
 describe('value object', () => {
-  it('parses props with the value object schema', () => {
-    expect(() => new TestValueObject({ value: 'test' })).not.toThrow();
+  it('should be able to retain the normalized value', () => {
+    const result = new TestValueObject({ value: '  test  ' });
+    expect(result.value).toBe('test');
   });
 
-  it('throws a common error when props are invalid', () => {
+  it('should not be able to create an instance with invalid values', () => {
     expect(
       () => new TestValueObject({ value: 1 } as unknown as z.input<typeof schema>),
     ).toThrow(EntityValidationError);

@@ -2,7 +2,7 @@ import { EntityValidationError } from '@core/errors/common/entity-validation-err
 import { Area } from './area';
 
 describe('Area', () => {
-  it('should be able to create an area with valid schema data', () => {
+  it('should be able to preserve an area with two decimal places', () => {
     expect(Area.create(12.34).value).toBe(12.34);
   });
 

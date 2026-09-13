@@ -15,7 +15,7 @@ export class UpdateProducerUseCase {
 
   async execute(params: Params): Promise<Producer> {
     const producer = await this.repository.findById(params.id);
-    if (!producer) throw new ResourceNotFoundError();
+    if (!producer) throw new ResourceNotFoundError('Producer not found');
 
     const document =
       params.document === undefined ? undefined : Document.create(params.document);

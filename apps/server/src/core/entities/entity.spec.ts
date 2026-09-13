@@ -3,26 +3,31 @@ import { EntityValidationError } from '../errors/common/entity-validation-error'
 import { Entity } from './entity';
 import { UniqueEntityID } from './unique-entity-id';
 
-const schema = z.object({ name: z.string() });
+const schema = z.object({ name: z.string().trim() });
 
 class TestEntity extends Entity<typeof schema> {
   constructor(props: z.input<typeof schema>, id?: UniqueEntityID) {
     super(TestEntity.parse(schema, props), id);
   }
+
+  get name() {
+    return this.props.name;
+  }
 }
 
 describe('entity', () => {
-  it('parses props with the entity schema', () => {
-    expect(() => new TestEntity({ name: 'John' })).not.toThrow();
+  it('should be able to retain the normalized entity name', () => {
+    const result = new TestEntity({ name: '  John  ' });
+    expect(result.name).toBe('John');
   });
 
-  it('throws a common error when props are invalid', () => {
+  it('should not be able to create an instance with invalid values', () => {
     expect(
       () => new TestEntity({ name: 1 } as unknown as z.input<typeof schema>),
     ).toThrow(EntityValidationError);
   });
 
-  it('preserves the id received by the constructor', () => {
+  it('should be able to preserve a supplied entity ID', () => {
     const id = new UniqueEntityID('entity-id');
     const entity = new TestEntity({ name: 'John' }, id);
 

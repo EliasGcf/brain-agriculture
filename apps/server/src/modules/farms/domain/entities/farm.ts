@@ -11,11 +11,10 @@ const schema = z
     state: z.string().trim().min(1),
     totalArea: z
       .custom<Area>((value) => value instanceof Area)
-      .refine((area) => area.value > 0, {
-        message: 'Total area must be positive',
-      }),
+      .refine((area) => area.value > 0, { message: 'Total area must be positive' }),
     arableArea: z.custom<Area>((value) => value instanceof Area),
     vegetationArea: z.custom<Area>((value) => value instanceof Area),
+    createdAt: z.date().default(() => new Date()),
   })
   .superRefine((props, ctx) => {
     if (props.arableArea.value + props.vegetationArea.value > props.totalArea.value) {
@@ -28,10 +27,15 @@ const schema = z
   });
 
 type Schema = typeof schema;
+type Input = z.input<Schema>;
 
 export class Farm extends Entity<Schema> {
-  static create(props: z.input<Schema>, id?: UniqueEntityID) {
+  static create(props: Input, id?: UniqueEntityID) {
     return new Farm(Farm.parse(schema, props), id);
+  }
+
+  update(props: Partial<Input>) {
+    this.props = Farm.parse(schema, { ...this.props, ...props });
   }
 
   get name() {
@@ -60,5 +64,9 @@ export class Farm extends Entity<Schema> {
 
   get vegetationArea() {
     return this.props.vegetationArea;
+  }
+
+  get createdAt() {
+    return this.props.createdAt;
   }
 }

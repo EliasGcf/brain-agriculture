@@ -11,7 +11,7 @@ export class GetProducerByIdUseCase {
 
   async execute(params: Params): Promise<Producer> {
     const producer = await this.repository.findById(params.id);
-    if (!producer) throw new ResourceNotFoundError();
+    if (!producer) throw new ResourceNotFoundError('Producer not found');
     return producer;
   }
 }

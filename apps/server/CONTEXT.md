@@ -17,7 +17,7 @@ The producer's registration identifier, containing a CPF or CNPJ and stored with
 _Avoid_: Treating CPF and CNPJ as separate concepts in this version
 
 **Farm**:
-A rural area belonging to exactly one producer, with total, arable, and vegetation areas. A farm may exist without harvests or planted crops.
+A rural area belonging to exactly one producer, with total, arable, and vegetation areas. A farm may exist without harvests or planted crops and may be transferred to another existing producer.
 _Avoid_: Rural property, real estate property
 
 **Harvest**:
@@ -27,6 +27,8 @@ _Avoid_: Agricultural period, season
 **Planted crop**:
 A named crop record belonging to a harvest of a farm.
 _Avoid_: Crop, plantation
+
+Planted crop names are not required to be unique within a harvest; repeated registrations are allowed in this version.
 
 **Arable area**:
 The part of a farm's total area intended for cultivation.

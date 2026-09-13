@@ -34,4 +34,28 @@ describe('Farm', () => {
       }),
     ).toThrow(EntityValidationError);
   });
+
+  it('should be able to update a farm while preserving its identity', () => {
+    const id = new UniqueEntityID('farm-1');
+    const createdAt = new Date('2026-01-01T00:00:00.000Z');
+    const farm = Farm.create({ ...valid, createdAt }, id);
+
+    farm.update({ name: 'Fazenda Nova', arableArea: Area.create(70) });
+
+    expect(farm.name).toBe('Fazenda Nova');
+    expect(farm.arableArea.value).toBe(70);
+    expect(farm.id).toBe(id);
+    expect(farm.createdAt).toBe(createdAt);
+  });
+
+  it('should not be able to update a farm when allocated areas exceed the total area', () => {
+    const farm = Farm.create(valid);
+
+    expect(() =>
+      farm.update({
+        arableArea: Area.create(80),
+        vegetationArea: Area.create(30),
+      }),
+    ).toThrow(EntityValidationError);
+  });
 });
