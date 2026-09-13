@@ -1,4 +1,4 @@
-import { ResourceNotFoundError } from '@core/errors/common/resource-not-found-error';
+import { ResourceNotFoundError } from '@core/errors/common/resource-not-found.error';
 import { makePlantedCrop } from '@test/factories/make-planted-crop.factory';
 import { InMemoryPlantedCropsRepository } from '@test/repositories/in-memory-planted-crops.repository';
 import { DeletePlantedCropUseCase } from './delete-planted-crop.use-case';

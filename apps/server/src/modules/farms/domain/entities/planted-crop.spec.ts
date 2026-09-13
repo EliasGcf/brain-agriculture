@@ -1,4 +1,4 @@
-import { EntityValidationError } from '@core/errors/common/entity-validation-error';
+import { EntityValidationError } from '@core/errors/common/entity-validation.error';
 import { PlantedCrop } from './planted-crop';
 import { UniqueEntityID } from '@core/entities/unique-entity-id';
 import { makePlantedCrop } from '@test/factories/make-planted-crop.factory';

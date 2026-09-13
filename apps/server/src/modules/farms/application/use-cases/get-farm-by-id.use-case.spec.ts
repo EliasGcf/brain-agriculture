@@ -1,4 +1,4 @@
-import { ResourceNotFoundError } from '@core/errors/common/resource-not-found-error';
+import { ResourceNotFoundError } from '@core/errors/common/resource-not-found.error';
 import { makeFarm } from '@test/factories/make-farm.factory';
 import { InMemoryFarmsRepository } from '@test/repositories/in-memory-farms.repository';
 import { InMemoryHarvestsRepository } from '@test/repositories/in-memory-harvests.repository';

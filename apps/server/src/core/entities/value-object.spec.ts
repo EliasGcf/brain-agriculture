@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { EntityValidationError } from '../errors/common/entity-validation-error';
+import { EntityValidationError } from '../errors/common/entity-validation.error';
 import { ValueObject } from './value-object';
 
 const schema = z.object({ value: z.string().trim() });

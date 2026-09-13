@@ -1,4 +1,4 @@
-import { ResourceNotFoundError } from './resource-not-found-error';
+import { ResourceNotFoundError } from './resource-not-found.error';
 
 describe('ResourceNotFoundError', () => {
   it('should be able to keep the default message', () => {

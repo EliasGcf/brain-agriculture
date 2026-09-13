@@ -2,6 +2,8 @@ import { faker } from '@faker-js/faker';
 import { Area } from '@modules/farms/domain/value-objects/area';
 import { Farm } from '@modules/farms/domain/entities/farm';
 import { UniqueEntityID } from '@core/entities/unique-entity-id';
+import { Injectable } from '@nestjs/common';
+import { FarmsRepository } from '@modules/farms/domain/repositories/farms.repository';
 
 type Overrides = {
   producerId?: string;
@@ -30,4 +32,13 @@ export function makeFarm(data: Overrides = {}) {
     },
     data.id,
   );
+}
+
+@Injectable()
+export class FarmFactory {
+  constructor(private farmsRepository: FarmsRepository) {}
+
+  async make(data?: Overrides) {
+    return this.farmsRepository.save(makeFarm(data));
+  }
 }

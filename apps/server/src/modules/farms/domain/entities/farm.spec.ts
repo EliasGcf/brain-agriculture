@@ -1,4 +1,4 @@
-import { EntityValidationError } from '@core/errors/common/entity-validation-error';
+import { EntityValidationError } from '@core/errors/common/entity-validation.error';
 import { Area } from '@modules/farms/domain/value-objects/area';
 import { UniqueEntityID } from '@core/entities/unique-entity-id';
 import { Farm } from './farm';

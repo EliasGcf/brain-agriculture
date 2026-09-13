@@ -1,6 +1,7 @@
 import { PaginatedResult } from '@core/dto/paginated-result';
 import { Producer } from '@modules/producers/domain/entities/producer';
 import { ProducersRepository } from '@modules/producers/domain/repositories/producers.repository';
+import { Injectable } from '@nestjs/common';
 
 export interface Params {
   name?: string;
@@ -9,6 +10,7 @@ export interface Params {
   perPage: number;
 }
 
+@Injectable()
 export class ListProducersUseCase {
   constructor(private readonly repository: ProducersRepository) {}
 

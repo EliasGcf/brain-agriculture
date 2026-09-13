@@ -1,10 +1,12 @@
-import { ResourceNotFoundError } from '@core/errors/common/resource-not-found-error';
+import { ResourceNotFoundError } from '@core/errors/common/resource-not-found.error';
 import { PlantedCropsRepository } from '@modules/farms/domain/repositories/planted-crops.repository';
+import { Injectable } from '@nestjs/common';
 
 interface Params {
   id: string;
 }
 
+@Injectable()
 export class DeletePlantedCropUseCase {
   constructor(private readonly plantedCropsRepository: PlantedCropsRepository) {}
 

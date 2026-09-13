@@ -3,6 +3,8 @@ import { cpf, cnpj } from 'cpf-cnpj-validator';
 import { UniqueEntityID } from '@core/entities/unique-entity-id';
 import { Document } from '@modules/producers/domain/value-objects/document';
 import { Producer } from '@modules/producers/domain/entities/producer';
+import { Injectable } from '@nestjs/common';
+import { ProducersRepository } from '@modules/producers/domain/repositories/producers.repository';
 
 type Overrides = {
   name?: string;
@@ -22,4 +24,13 @@ export function makeProducer(data: Overrides = {}) {
     },
     data.id,
   );
+}
+
+@Injectable()
+export class ProducerFactory {
+  constructor(private producersRepository: ProducersRepository) {}
+
+  async make(data?: Overrides) {
+    return await this.producersRepository.save(makeProducer(data));
+  }
 }

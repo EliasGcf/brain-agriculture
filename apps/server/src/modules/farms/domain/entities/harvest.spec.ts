@@ -1,4 +1,4 @@
-import { EntityValidationError } from '@core/errors/common/entity-validation-error';
+import { EntityValidationError } from '@core/errors/common/entity-validation.error';
 import { Harvest } from './harvest';
 import { UniqueEntityID } from '@core/entities/unique-entity-id';
 import { makeHarvest } from '@test/factories/make-harvest.factory';

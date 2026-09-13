@@ -1,4 +1,4 @@
-import { ResourceNotFoundError } from '@core/errors/common/resource-not-found-error';
+import { ResourceNotFoundError } from '@core/errors/common/resource-not-found.error';
 import { InMemoryProducersRepository } from '@test/repositories/in-memory-producers.repository';
 import { makeProducer } from '@test/factories/make-producer.factory';
 import { GetProducerByIdUseCase } from './get-producer-by-id.use-case';

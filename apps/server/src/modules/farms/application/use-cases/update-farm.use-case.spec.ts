@@ -1,6 +1,6 @@
-import { EntityValidationError } from '@core/errors/common/entity-validation-error';
+import { EntityValidationError } from '@core/errors/common/entity-validation.error';
 import { Area } from '@modules/farms/domain/value-objects/area';
-import { ResourceNotFoundError } from '@core/errors/common/resource-not-found-error';
+import { ResourceNotFoundError } from '@core/errors/common/resource-not-found.error';
 import { makeProducer } from '@test/factories/make-producer.factory';
 import { makeFarm } from '@test/factories/make-farm.factory';
 import { InMemoryProducersRepository } from '@test/repositories/in-memory-producers.repository';

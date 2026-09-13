@@ -2,7 +2,8 @@ import { ProducersRepository } from '@modules/producers/domain/repositories/prod
 import { Farm } from '@modules/farms/domain/entities/farm';
 import { Area } from '@modules/farms/domain/value-objects/area';
 import { FarmsRepository } from '@modules/farms/domain/repositories/farms.repository';
-import { ResourceNotFoundError } from '@core/errors/common/resource-not-found-error';
+import { ResourceNotFoundError } from '@core/errors/common/resource-not-found.error';
+import { Injectable } from '@nestjs/common';
 
 interface Params {
   name: string;
@@ -14,6 +15,7 @@ interface Params {
   vegetationArea: number;
 }
 
+@Injectable()
 export class CreateFarmUseCase {
   constructor(
     private readonly farmsRepository: FarmsRepository,

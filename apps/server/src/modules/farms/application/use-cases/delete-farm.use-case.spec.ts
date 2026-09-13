@@ -1,4 +1,4 @@
-import { ResourceNotFoundError } from '@core/errors/common/resource-not-found-error';
+import { ResourceNotFoundError } from '@core/errors/common/resource-not-found.error';
 import { makePlantedCrop } from '@test/factories/make-planted-crop.factory';
 import { makeFarm } from '@test/factories/make-farm.factory';
 import { makeHarvest } from '@test/factories/make-harvest.factory';

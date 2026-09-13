@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { EntityValidationError } from '../errors/common/entity-validation-error';
+import { EntityValidationError } from '../errors/common/entity-validation.error';
 import { Entity } from './entity';
 import { UniqueEntityID } from './unique-entity-id';
 

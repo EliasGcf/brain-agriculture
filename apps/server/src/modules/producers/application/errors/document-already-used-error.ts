@@ -1,6 +1,6 @@
-import { UseCaseError } from '@core/errors/use-case-error';
+import { AppError } from '@core/errors/app.error';
 
-export class DocumentAlreadyUsedError extends Error implements UseCaseError {
+export class DocumentAlreadyUsedError extends AppError {
   constructor() {
     super('Document already used');
     this.name = 'DocumentAlreadyUsedError';

@@ -1,4 +1,4 @@
-import { EntityValidationError } from '@core/errors/common/entity-validation-error';
+import { EntityValidationError } from '@core/errors/common/entity-validation.error';
 import { UniqueEntityID } from '@core/entities/unique-entity-id';
 import { Document } from '@modules/producers/domain/value-objects/document';
 import { Producer } from '@modules/producers/domain/entities/producer';

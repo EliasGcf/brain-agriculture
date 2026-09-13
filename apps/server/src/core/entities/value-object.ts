@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { EntityValidationError } from '../errors/common/entity-validation-error';
+import { EntityValidationError } from '../errors/common/entity-validation.error';
 
 export abstract class ValueObject<Props extends z.ZodType> {
   protected props: z.output<Props>;

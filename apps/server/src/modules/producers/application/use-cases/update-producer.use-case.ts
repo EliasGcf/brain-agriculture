@@ -1,8 +1,9 @@
-import { ResourceNotFoundError } from '@core/errors/common/resource-not-found-error';
+import { ResourceNotFoundError } from '@core/errors/common/resource-not-found.error';
 import { Document } from '@modules/producers/domain/value-objects/document';
 import { Producer } from '@modules/producers/domain/entities/producer';
 import { ProducersRepository } from '@modules/producers/domain/repositories/producers.repository';
 import { DocumentAlreadyUsedError } from '../errors/document-already-used-error';
+import { Injectable } from '@nestjs/common';
 
 export interface Params {
   id: string;
@@ -10,6 +11,7 @@ export interface Params {
   document?: string;
 }
 
+@Injectable()
 export class UpdateProducerUseCase {
   constructor(private readonly repository: ProducersRepository) {}
 

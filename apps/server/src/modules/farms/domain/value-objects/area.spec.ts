@@ -1,4 +1,4 @@
-import { EntityValidationError } from '@core/errors/common/entity-validation-error';
+import { EntityValidationError } from '@core/errors/common/entity-validation.error';
 import { Area } from './area';
 
 describe('Area', () => {

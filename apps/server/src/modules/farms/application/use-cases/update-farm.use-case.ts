@@ -1,8 +1,9 @@
-import { ResourceNotFoundError } from '@core/errors/common/resource-not-found-error';
+import { ResourceNotFoundError } from '@core/errors/common/resource-not-found.error';
 import { Farm } from '@modules/farms/domain/entities/farm';
 import { Area } from '@modules/farms/domain/value-objects/area';
 import { FarmsRepository } from '@modules/farms/domain/repositories/farms.repository';
 import { ProducersRepository } from '@modules/producers/domain/repositories/producers.repository';
+import { Injectable } from '@nestjs/common';
 
 export type UpdateFarmParams = {
   id: string;
@@ -15,6 +16,7 @@ export type UpdateFarmParams = {
   vegetationArea?: number;
 };
 
+@Injectable()
 export class UpdateFarmUseCase {
   constructor(
     private readonly farmsRepository: FarmsRepository,

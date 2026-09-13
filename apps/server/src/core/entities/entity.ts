@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { EntityValidationError } from '../errors/common/entity-validation-error';
+import { EntityValidationError } from '../errors/common/entity-validation.error';
 import { UniqueEntityID } from './unique-entity-id';
 
 export abstract class Entity<Props extends z.ZodType> {

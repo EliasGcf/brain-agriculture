@@ -1,13 +1,15 @@
-import { ResourceNotFoundError } from '@core/errors/common/resource-not-found-error';
+import { ResourceNotFoundError } from '@core/errors/common/resource-not-found.error';
 import { Harvest } from '@modules/farms/domain/entities/harvest';
 import { FarmsRepository } from '@modules/farms/domain/repositories/farms.repository';
 import { HarvestsRepository } from '@modules/farms/domain/repositories/harvests.repository';
+import { Injectable } from '@nestjs/common';
 
 interface Params {
   name: string;
   farmId: string;
 }
 
+@Injectable()
 export class CreateHarvestUseCase {
   constructor(
     private readonly harvestsRepository: HarvestsRepository,
