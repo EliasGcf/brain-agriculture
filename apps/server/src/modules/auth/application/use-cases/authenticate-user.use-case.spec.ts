@@ -71,6 +71,9 @@ describe('AuthenticateUserUseCase', () => {
     await expect(
       useCase.execute({ email: 'unknown@example.com', password: 'plain-password' }),
     ).rejects.toBeInstanceOf(InvalidCredentialsError);
+
+    expect(hashComparer.receivedPlain).toBe('plain-password');
+    expect(hashComparer.receivedHash).toBeDefined();
   });
 
   it('should not be able to authenticate with a wrong password', async () => {
@@ -83,5 +86,8 @@ describe('AuthenticateUserUseCase', () => {
     await expect(
       useCase.execute({ email: 'maria@example.com', password: 'wrong-password' }),
     ).rejects.toBeInstanceOf(InvalidCredentialsError);
+
+    expect(hashComparer.receivedPlain).toBe('wrong-password');
+    expect(hashComparer.receivedHash).toBe('hashed-password');
   });
 });
