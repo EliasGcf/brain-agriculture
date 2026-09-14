@@ -1,7 +1,6 @@
 {
   "name": "brain-agriculture",
   "private": true,
-  "type": "commonjs",
   "engines": {
     "bun": "1.4.2",
     "node": "24.21.0"
