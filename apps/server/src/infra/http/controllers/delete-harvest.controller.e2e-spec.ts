@@ -9,9 +9,11 @@ import { HarvestsRepository } from '@modules/farms/domain/repositories/harvests.
 import { FarmFactory } from '@test/factories/make-farm.factory';
 import { HarvestFactory } from '@test/factories/make-harvest.factory';
 import { ProducerFactory } from '@test/factories/make-producer.factory';
+import { authenticate } from '@test/e2e-auth';
 
 describe('DeleteHarvestController (e2e)', () => {
   let app: INestApplication<App>;
+  let accessToken: string;
   let producerFactory: ProducerFactory;
   let harvestsRepository: HarvestsRepository;
   let farmFactory: FarmFactory;
@@ -29,6 +31,7 @@ describe('DeleteHarvestController (e2e)', () => {
     farmFactory = moduleRef.get<FarmFactory>(FarmFactory);
     harvestFactory = moduleRef.get<HarvestFactory>(HarvestFactory);
     await app.init();
+    accessToken = await authenticate(app);
   });
 
   afterAll(() => app.close());
@@ -38,7 +41,10 @@ describe('DeleteHarvestController (e2e)', () => {
     const farm = await farmFactory.make({ producerId: producer.id.toString() });
     const harvest = await harvestFactory.make({ farmId: farm.id.toString() });
 
-    await request(app.getHttpServer()).delete(`/harvests/${harvest.id}`).expect(204);
+    await request(app.getHttpServer())
+      .delete(`/harvests/${harvest.id}`)
+      .set('Authorization', `Bearer ${accessToken}`)
+      .expect(204);
     await expect(harvestsRepository.findById(harvest.id.toString())).resolves.toBeNull();
   });
 });

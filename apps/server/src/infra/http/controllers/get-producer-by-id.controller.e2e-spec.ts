@@ -8,9 +8,11 @@ import { HttpModule } from '@infra/http/http.module';
 import { ProducerPresenter } from '@infra/http/presenters/producer.presenter';
 import { ProducersRepository } from '@modules/producers/domain/repositories/producers.repository';
 import { ProducerFactory } from '@test/factories/make-producer.factory';
+import { authenticate } from '@test/e2e-auth';
 
 describe('GetProducerByIdController (e2e)', () => {
   let app: INestApplication<App>;
+  let accessToken: string;
   let producerFactory: ProducerFactory;
   let producersRepository: ProducersRepository;
 
@@ -24,6 +26,7 @@ describe('GetProducerByIdController (e2e)', () => {
     producerFactory = moduleRef.get<ProducerFactory>(ProducerFactory);
     producersRepository = moduleRef.get<ProducersRepository>(ProducersRepository);
     await app.init();
+    accessToken = await authenticate(app);
   });
 
   afterAll(() => app.close());
@@ -32,6 +35,7 @@ describe('GetProducerByIdController (e2e)', () => {
     const producer = await producerFactory.make();
     const response = await request(app.getHttpServer())
       .get(`/producers/${producer.id}`)
+      .set('Authorization', `Bearer ${accessToken}`)
       .expect(200);
 
     const savedProducer = await producersRepository.findById(response.body.id);

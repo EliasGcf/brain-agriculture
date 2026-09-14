@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 
 import { DatabaseModule } from '../database/database.module';
+import { AuthModule } from '@modules/auth/auth.module';
 import { CreateProducerController } from '@infra/http/controllers/create-producer.controller';
 import { CreateProducerUseCase } from '@modules/producers/application/use-cases/create-producer.use-case';
 import { APP_FILTER } from '@nestjs/core';
@@ -50,7 +51,7 @@ import { GetDashboardMetricsUseCase } from '@modules/metrics/application/use-cas
 import { HealthController } from './controllers/health.controller';
 
 @Module({
-  imports: [DatabaseModule],
+  imports: [DatabaseModule, AuthModule],
   controllers: [
     CreateProducerController,
     ListProducersController,

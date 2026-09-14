@@ -10,9 +10,11 @@ import { HarvestsRepository } from '@modules/farms/domain/repositories/harvests.
 import { FarmFactory } from '@test/factories/make-farm.factory';
 import { HarvestFactory } from '@test/factories/make-harvest.factory';
 import { ProducerFactory } from '@test/factories/make-producer.factory';
+import { authenticate } from '@test/e2e-auth';
 
 describe('GetHarvestByIdController (e2e)', () => {
   let app: INestApplication<App>;
+  let accessToken: string;
   let producerFactory: ProducerFactory;
   let farmFactory: FarmFactory;
   let harvestFactory: HarvestFactory;
@@ -30,6 +32,7 @@ describe('GetHarvestByIdController (e2e)', () => {
     harvestFactory = moduleRef.get<HarvestFactory>(HarvestFactory);
     harvestsRepository = moduleRef.get<HarvestsRepository>(HarvestsRepository);
     await app.init();
+    accessToken = await authenticate(app);
   });
 
   afterAll(() => app.close());
@@ -41,6 +44,7 @@ describe('GetHarvestByIdController (e2e)', () => {
 
     const response = await request(app.getHttpServer())
       .get(`/harvests/${harvest.id}`)
+      .set('Authorization', `Bearer ${accessToken}`)
       .expect(200);
 
     const rawHarvest = await harvestsRepository.findById(response.body.id);

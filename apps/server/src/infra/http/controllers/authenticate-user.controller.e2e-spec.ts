@@ -4,7 +4,7 @@ import request from 'supertest';
 import { App } from 'supertest/types';
 
 import { AuthenticateUserUseCase } from '@modules/auth/application/use-cases/authenticate-user.use-case';
-import { AuthenticateUserController } from './authenticate-user.controller';
+import { HttpModule } from '@infra/http/http.module';
 
 describe('AuthenticateUserController (e2e)', () => {
   let app: INestApplication<App>;
@@ -16,9 +16,11 @@ describe('AuthenticateUserController (e2e)', () => {
     };
 
     const moduleRef = await Test.createTestingModule({
-      controllers: [AuthenticateUserController],
-      providers: [{ provide: AuthenticateUserUseCase, useValue: useCase }],
-    }).compile();
+      imports: [HttpModule],
+    })
+      .overrideProvider(AuthenticateUserUseCase)
+      .useValue(useCase)
+      .compile();
 
     app = moduleRef.createNestApplication();
     app.useGlobalPipes(new StandardSchemaValidationPipe());
@@ -45,5 +47,9 @@ describe('AuthenticateUserController (e2e)', () => {
       .post('/auth/login')
       .send({ email: 'invalid-email', password: '' })
       .expect(400);
+  });
+
+  it('should not be able to access a protected route without a token', async () => {
+    await request(app.getHttpServer()).get('/producers').expect(401);
   });
 });

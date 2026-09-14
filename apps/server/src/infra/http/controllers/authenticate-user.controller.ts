@@ -3,6 +3,7 @@ import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { z } from 'zod';
 
 import { AuthenticateUserUseCase } from '@modules/auth/application/use-cases/authenticate-user.use-case';
+import { Public } from '@modules/auth/infra/http/public.decorator';
 
 const AuthenticateUserSchema = z.object({
   email: z.string().trim().toLowerCase().email(),
@@ -15,6 +16,7 @@ export class AuthenticateUserController {
   constructor(private readonly useCase: AuthenticateUserUseCase) {}
 
   @Post('login')
+  @Public()
   @HttpCode(200)
   @ApiOkResponse()
   async handle(

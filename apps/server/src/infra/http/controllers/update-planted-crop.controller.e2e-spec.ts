@@ -11,9 +11,11 @@ import { FarmFactory } from '@test/factories/make-farm.factory';
 import { HarvestFactory } from '@test/factories/make-harvest.factory';
 import { PlantedCropFactory } from '@test/factories/make-planted-crop.factory';
 import { ProducerFactory } from '@test/factories/make-producer.factory';
+import { authenticate } from '@test/e2e-auth';
 
 describe('UpdatePlantedCropController (e2e)', () => {
   let app: INestApplication<App>;
+  let accessToken: string;
   let producerFactory: ProducerFactory;
   let farmFactory: FarmFactory;
   let harvestFactory: HarvestFactory;
@@ -34,6 +36,7 @@ describe('UpdatePlantedCropController (e2e)', () => {
     plantedCropsRepository =
       moduleRef.get<PlantedCropsRepository>(PlantedCropsRepository);
     await app.init();
+    accessToken = await authenticate(app);
   });
 
   afterAll(() => app.close());
@@ -46,6 +49,7 @@ describe('UpdatePlantedCropController (e2e)', () => {
 
     const response = await request(app.getHttpServer())
       .patch(`/planted-crops/${crop.id}`)
+      .set('Authorization', `Bearer ${accessToken}`)
       .send({ name: 'Updated crop' })
       .expect(200);
 
