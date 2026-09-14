@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Inject, Injectable, Module } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Test } from '@nestjs/testing';
 
@@ -12,11 +12,19 @@ process.env.JWT_SECRET = 'test-secret';
 
 describe('CryptographyModule', () => {
   it('should be able to resolve cryptography contracts and sign and verify a token', async () => {
-    const { CryptographyModule } = await import(
-      './cryptography.module.js'
-    );
+    const { CryptographyModule } = require('./cryptography.module') as typeof import('./cryptography.module');
 
-    @Module({ imports: [CryptographyModule] })
+    @Injectable()
+    class Consumer {
+      constructor(
+        @Inject(HashGenerator) readonly hashGenerator: HashGenerator,
+        @Inject(HashComparer) readonly hashComparer: HashComparer,
+        @Inject(Encrypter) readonly encrypter: Encrypter,
+        @Inject(JwtService) readonly jwtService: JwtService,
+      ) {}
+    }
+
+    @Module({ imports: [CryptographyModule], providers: [Consumer], exports: [Consumer] })
     class ConsumerModule {}
 
     const moduleRef = await Test.createTestingModule({
@@ -26,19 +34,18 @@ describe('CryptographyModule', () => {
       .useValue({ get: (key: string) => (key === 'JWT_SECRET' ? 'test-secret' : undefined) })
       .compile();
 
-    const hashGenerator = moduleRef.get(HashGenerator);
-    const hashComparer = moduleRef.get(HashComparer);
-    const encrypter = moduleRef.get(Encrypter);
-    const jwtService = moduleRef.get(JwtService);
-    const token = await encrypter.encrypt({ sub: 'user-id' });
-    const payload = await jwtService.verifyAsync<{
+    const consumer = moduleRef.select(ConsumerModule).get(Consumer, { strict: true });
+    const token = await consumer.encrypter.encrypt({ sub: 'user-id' });
+    const payload = await consumer.jwtService.verifyAsync<{
       sub: string;
       exp: number;
       iat: number;
     }>(token);
 
-    expect(hashGenerator).toBeDefined();
-    expect(hashComparer).toBeDefined();
+    expect(consumer.hashGenerator).toBeDefined();
+    expect(consumer.hashComparer).toBeDefined();
+    expect(consumer.encrypter).toBeDefined();
+    expect(consumer.jwtService).toBeDefined();
     expect(payload.sub).toBe('user-id');
     expect(payload.exp - payload.iat).toBe(86400);
 
