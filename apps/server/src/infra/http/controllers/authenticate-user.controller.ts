@@ -11,11 +11,11 @@ const AuthenticateUserSchema = z.object({
 });
 
 @ApiTags('Auth')
-@Controller('auth')
+@Controller('auth/login')
 export class AuthenticateUserController {
   constructor(private readonly useCase: AuthenticateUserUseCase) {}
 
-  @Post('login')
+  @Post()
   @Public()
   @HttpCode(200)
   @ApiOkResponse()
