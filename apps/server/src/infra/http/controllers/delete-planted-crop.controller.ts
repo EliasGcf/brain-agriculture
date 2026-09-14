@@ -1,8 +1,9 @@
 import { Controller, Delete, HttpCode, Param } from '@nestjs/common';
-import { ApiNoContentResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiNoContentResponse, ApiTags } from '@nestjs/swagger';
 import { DeletePlantedCropUseCase } from '@modules/farms/application/use-cases/delete-planted-crop.use-case';
 import z from 'zod';
 
+@ApiBearerAuth()
 @ApiTags('Planted Crops')
 @Controller('planted-crops/:id')
 export class DeletePlantedCropController {

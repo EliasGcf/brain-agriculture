@@ -1,5 +1,5 @@
 import { Body, Controller, Post } from '@nestjs/common';
-import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
 import { z } from 'zod';
 import { CreateHarvestUseCase } from '@modules/farms/application/use-cases/create-harvest.use-case';
 import { HarvestPresenter } from '../presenters/harvest.presenter';
@@ -9,6 +9,7 @@ const CreateHarvestSchema = z.object({
   farmId: z.string().min(1),
 });
 
+@ApiBearerAuth()
 @ApiTags('Harvests')
 @Controller('harvests')
 export class CreateHarvestController {

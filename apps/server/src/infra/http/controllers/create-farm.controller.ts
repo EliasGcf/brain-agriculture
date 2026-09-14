@@ -1,5 +1,5 @@
 import { Body, Controller, Post } from '@nestjs/common';
-import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
 import { z } from 'zod';
 
 import { CreateFarmUseCase } from '@modules/farms/application/use-cases/create-farm.use-case';
@@ -7,7 +7,7 @@ import { FarmPresenter } from '@infra/http/presenters/farm.presenter';
 
 const FarmCreateSchema = z.object({
   name: z.string(),
-  producerId: z.string(),
+  producerId: z.uuid(),
   city: z.string(),
   state: z.string(),
   totalArea: z.number(),
@@ -17,6 +17,7 @@ const FarmCreateSchema = z.object({
 
 export type CreateFarmBody = z.infer<typeof FarmCreateSchema>;
 
+@ApiBearerAuth()
 @ApiTags('Farms')
 @Controller('farms')
 export class CreateFarmController {

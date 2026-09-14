@@ -1,11 +1,12 @@
 import { Body, Controller, Param, Patch } from '@nestjs/common';
-import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { z } from 'zod';
 import { UpdateHarvestUseCase } from '@modules/farms/application/use-cases/update-harvest.use-case';
 import { HarvestPresenter } from '../presenters/harvest.presenter';
 
 const UpdateHarvestSchema = z.object({ name: z.string().min(1) });
 
+@ApiBearerAuth()
 @ApiTags('Harvests')
 @Controller('harvests/:id')
 export class UpdateHarvestController {

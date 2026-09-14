@@ -1,9 +1,10 @@
 import { Controller, Get, Param } from '@nestjs/common';
-import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { GetProducerByIdUseCase } from '@modules/producers/application/use-cases/get-producer-by-id.use-case';
 import { ProducerPresenter } from '../presenters/producer.presenter';
 import z from 'zod';
 
+@ApiBearerAuth()
 @ApiTags('Producers')
 @Controller('producers/:id')
 export class GetProducerByIdController {

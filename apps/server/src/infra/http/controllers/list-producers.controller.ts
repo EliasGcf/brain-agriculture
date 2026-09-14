@@ -1,5 +1,5 @@
 import { Controller, Get, Query } from '@nestjs/common';
-import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { ListProducersUseCase } from '@modules/producers/application/use-cases/list-producers.use-case';
 import { ProducerPresenter } from '../presenters/producer.presenter';
 import z from 'zod';
@@ -10,6 +10,7 @@ const QuerySchema = z.object({
   perPage: z.coerce.number().optional().default(10),
 });
 
+@ApiBearerAuth()
 @ApiTags('Producers')
 @Controller('producers')
 export class ListProducersController {

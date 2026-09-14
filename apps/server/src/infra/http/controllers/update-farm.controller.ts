@@ -1,5 +1,5 @@
 import { Body, Controller, Param, Patch } from '@nestjs/common';
-import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { z } from 'zod';
 import { UpdateFarmUseCase } from '@modules/farms/application/use-cases/update-farm.use-case';
 import { FarmPresenter } from '../presenters/farm.presenter';
@@ -14,6 +14,7 @@ const UpdateFarmSchema = z.object({
   vegetationArea: z.number().optional(),
 });
 
+@ApiBearerAuth()
 @ApiTags('Farms')
 @Controller('farms/:id')
 export class UpdateFarmController {

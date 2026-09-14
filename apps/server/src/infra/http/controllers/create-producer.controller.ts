@@ -1,4 +1,4 @@
-import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
 import { Body, Controller, Post } from '@nestjs/common';
 import z from 'zod';
 import { cnpj as cnpjTools } from 'cpf-cnpj-validator';
@@ -20,6 +20,7 @@ const CreateProducerSchema = z.object(
   { error: 'Invalid producer data' },
 );
 
+@ApiBearerAuth()
 @ApiTags('Producers')
 @Controller('/producers')
 export class CreateProducerController {

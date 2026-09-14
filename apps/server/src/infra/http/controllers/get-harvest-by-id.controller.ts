@@ -1,9 +1,10 @@
 import { Controller, Get, Param } from '@nestjs/common';
-import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { GetHarvestByIdUseCase } from '@modules/farms/application/use-cases/get-harvest-by-id.use-case';
 import { HarvestPresenter } from '../presenters/harvest.presenter';
 import z from 'zod';
 
+@ApiBearerAuth()
 @ApiTags('Harvests')
 @Controller('harvests/:id')
 export class GetHarvestByIdController {

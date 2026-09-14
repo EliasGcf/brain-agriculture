@@ -1,5 +1,5 @@
 import { Body, Controller, Param, Patch } from '@nestjs/common';
-import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { z } from 'zod';
 import { UpdateProducerUseCase } from '@modules/producers/application/use-cases/update-producer.use-case';
 import { ProducerPresenter } from '../presenters/producer.presenter';
@@ -9,6 +9,7 @@ const UpdateProducerSchema = z.object({
   document: z.string().min(1).optional(),
 });
 
+@ApiBearerAuth()
 @ApiTags('Producers')
 @Controller('producers/:id')
 export class UpdateProducerController {
