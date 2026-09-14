@@ -13,11 +13,10 @@ export class DrizzleUsersRepository implements UsersRepository {
   constructor(@Inject(DRIZZLE) public readonly db: DB) {}
 
   async findByEmail(email: string): Promise<User | null> {
-    const normalizedEmail = email.trim().toLowerCase();
     const [user] = await this.db
       .select()
       .from(schema.users)
-      .where(eq(schema.users.email, normalizedEmail))
+      .where(eq(schema.users.email, email.trim().toLowerCase()))
       .limit(1);
 
     if (!user) return null;

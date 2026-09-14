@@ -1,4 +1,4 @@
-import { makeUserFactory } from '../factories/make-user.factory';
+import { makeUser } from '../factories/make-user.factory';
 
 import { InMemoryUsersRepository } from './in-memory-users.repository';
 
@@ -10,7 +10,7 @@ describe('InMemoryUsersRepository', () => {
   });
 
   it('should be able to find an inserted user by normalized email', async () => {
-    const user = makeUserFactory({ email: 'User@Example.com' });
+    const user = makeUser({ email: 'User@Example.com' });
     repository.items.push(user);
 
     await expect(repository.findByEmail(' user@example.com ')).resolves.toBe(user);
