@@ -24,11 +24,15 @@ import { JwtEncrypter } from './jwt-encrypter';
   ],
   providers: [
     BcryptHasher,
-    JwtEncrypter,
+    {
+      provide: JwtEncrypter,
+      inject: [JwtService],
+      useFactory: (jwtService: JwtService) => new JwtEncrypter(jwtService),
+    },
     { provide: HashGenerator, useExisting: BcryptHasher },
     { provide: HashComparer, useExisting: BcryptHasher },
     { provide: Encrypter, useExisting: JwtEncrypter },
   ],
-  exports: [HashGenerator, HashComparer, Encrypter, JwtService],
+  exports: [HashGenerator, HashComparer, Encrypter, JwtModule],
 })
 export class CryptographyModule {}
