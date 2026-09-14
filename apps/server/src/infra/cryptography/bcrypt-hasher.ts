@@ -7,7 +7,7 @@ import { HashGenerator } from '@modules/auth/application/cryptography/hash-gener
 @Injectable()
 export class BcryptHasher implements HashGenerator, HashComparer {
   async hash(plain: string): Promise<string> {
-    return bcrypt.hash(plain, 8);
+    return bcrypt.hash(plain, 10);
   }
 
   async compare(plain: string, hash: string): Promise<boolean> {
