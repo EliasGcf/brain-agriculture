@@ -1,0 +1,17 @@
+# Web
+
+Frontend context for presenting the shared agricultural domain to an internal user. Shared terms and business rules live in the root [CONTEXT.md](../../CONTEXT.md).
+
+## Language
+
+**Farm count by crop**:
+The number of distinct farms in which a named planted crop is registered. A farm counts at most once for a crop, even if the crop appears in multiple harvests or multiple planted-crop records in that farm.
+_Avoid_: Crop hectares, number of planted-crop records
+
+**Dashboard**:
+A global view of the registered farms, total hectares, geographic distribution by total farm area, crop presence by distinct farm count, and farm land use.
+_Avoid_: Producer-specific dashboard, filtered dashboard
+
+**Farm summary**:
+The compact presentation of a farm used in producer and global farm lists, including its name, producer, location, total area, arable area, and vegetation area.
+_Avoid_: Farm detail
