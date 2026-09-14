@@ -42,3 +42,15 @@ Implemented and committed as `feat(auth): seed admin user`.
 - Server typecheck passed.
 - Server lint passed.
 - `db:seed` default command executed twice successfully against the configured database.
+
+## Additional Review Fix
+
+- Added a separate process-specific empty schema to `seed.spec.ts`, including isolated users table setup, pool max 1, and schema cleanup.
+- The new creation test runs the seed against the empty schema and verifies exactly one admin row whose password compares successfully with `12345678`.
+
+## Additional Validation
+
+- Seed Jest suite: 1 suite and 2 tests passed.
+- Server typecheck passed.
+- Server lint passed.
+- `git diff --check` passed.

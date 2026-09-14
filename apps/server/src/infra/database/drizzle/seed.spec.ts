@@ -16,6 +16,7 @@ describe('database seed', () => {
     process.env.DATABASE_URL ??
     'postgresql://postgres:postgres@localhost:5432/tests';
   const databaseSchema = `seed_test_${process.pid}_${randomUUID().replaceAll('-', '')}`;
+  const emptyDatabaseSchema = `seed_empty_test_${process.pid}_${randomUUID().replaceAll('-', '')}`;
   const adminEmail = 'admin@admin.com';
   const setupPool = new Pool({ connectionString, max: 1 });
   const pool = new Pool({
@@ -24,10 +25,17 @@ describe('database seed', () => {
     options: `-c search_path=${databaseSchema}`,
   });
   const db = drizzle(pool, { schema, casing: 'snake_case' });
+  const emptyPool = new Pool({
+    connectionString,
+    max: 1,
+    options: `-c search_path=${emptyDatabaseSchema}`,
+  });
+  const emptyDb = drizzle(emptyPool, { schema, casing: 'snake_case' });
   const hashComparer: HashComparer = new BcryptHasher();
 
   beforeAll(async () => {
     await setupPool.query(`CREATE SCHEMA "${databaseSchema}"`);
+    await setupPool.query(`CREATE SCHEMA "${emptyDatabaseSchema}"`);
     const usersMigration = await readFile(
       join(__dirname, '../../../../drizzle/0001_add_users.sql'),
       'utf8',
@@ -36,6 +44,12 @@ describe('database seed', () => {
       usersMigration.replace(
         'CREATE TABLE "users"',
         `CREATE TABLE "${databaseSchema}"."users"`,
+      ),
+    );
+    await setupPool.query(
+      usersMigration.replace(
+        'CREATE TABLE "users"',
+        `CREATE TABLE "${emptyDatabaseSchema}"."users"`,
       ),
     );
 
@@ -48,8 +62,28 @@ describe('database seed', () => {
 
   afterAll(async () => {
     await pool.end();
+    await emptyPool.end();
     await setupPool.query(`DROP SCHEMA "${databaseSchema}" CASCADE`);
+    await setupPool.query(`DROP SCHEMA "${emptyDatabaseSchema}" CASCADE`);
     await setupPool.end();
+  });
+
+  it('should be able to create the default admin account in an empty schema', async () => {
+    await seed({
+      connectionString,
+      schema: emptyDatabaseSchema,
+      max: 1,
+    });
+
+    const admins = await emptyDb
+      .select()
+      .from(schema.users)
+      .where(eq(schema.users.email, adminEmail));
+
+    expect(admins).toHaveLength(1);
+    await expect(
+      hashComparer.compare('12345678', admins[0]!.password),
+    ).resolves.toBe(true);
   });
 
   it('should be able to update the existing admin account idempotently', async () => {
