@@ -11,9 +11,12 @@ import { z } from 'zod';
 
 import { IS_PUBLIC_KEY } from "@infra/auth/public.decorator";
 
+const PayloadSchema = z.object({
+  sub: z.uuid()
+});
 
 type AuthenticatedRequest = Request & {
-  user?: Record<string, unknown>;
+  user?: z.infer<typeof PayloadSchema>
 };
 
 @Injectable()
@@ -37,12 +40,9 @@ export class JwtAuthGuard implements CanActivate {
     if (!token) throw new UnauthorizedException();
 
     try {
-      const payload = await this.jwtService.verifyAsync<Record<string, unknown>>(token);
-      if (typeof payload.sub !== 'string' || !isUuid(payload.sub)) {
-        throw new UnauthorizedException();
-      }
-
-      request.user = payload;
+      const payload = await this.jwtService.verifyAsync(token);
+      const validPayload = PayloadSchema.parse(payload);
+      request.user = validPayload;
       return true;
     } catch {
       throw new UnauthorizedException();
@@ -50,6 +50,3 @@ export class JwtAuthGuard implements CanActivate {
   }
 }
 
-function isUuid(value: string) {
-  return z.uuid().safeParse(value).success;
-}
