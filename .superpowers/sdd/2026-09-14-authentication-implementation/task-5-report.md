@@ -33,3 +33,8 @@ The guard spec was written before the guard existed. The first focused run faile
 
 - E2E execution requires `JWT_SECRET`; the repository's `.env.test` currently provides the database URL but not that variable, so validation supplied `JWT_SECRET=test-secret` at runtime.
 - The test helper inserts a unique admin user per E2E application and does not change production seed behavior.
+
+## Review fix
+
+- Added `JWT_SECRET="test-secret"` to `apps/server/.env.test`, allowing the standard E2E command to run without a manually exported secret.
+- Validation after the fix: `env -u JWT_SECRET bun run --cwd apps/server test:e2e --runInBand`, `bun run --cwd apps/server typecheck`, and `bun run --cwd apps/server lint` all passed.
