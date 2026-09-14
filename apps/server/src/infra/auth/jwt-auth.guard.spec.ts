@@ -1,40 +1,47 @@
-import { ExecutionContext, UnauthorizedException } from '@nestjs/common';
+import { UnauthorizedException } from '@nestjs/common';
+import { ExecutionContextHost } from '@nestjs/core/helpers/execution-context-host';
 import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 
+import { Public } from './public.decorator';
 import { JwtAuthGuard } from './jwt-auth.guard';
 
-describe('JwtAuthGuard', () => {
-  const reflector = { getAllAndOverride: jest.fn() } as unknown as Reflector;
-  const jwtService = { verifyAsync: jest.fn() } as unknown as JwtService;
-  let guard: JwtAuthGuard;
+const JWT_SECRET = 'test-secret';
+const USER_ID = '123e4567-e89b-12d3-a456-426614174000';
 
-  const makeContext = (authorization?: string) => {
-    const request = { headers: { authorization } };
-    const context = {
-      getHandler: jest.fn(),
-      getClass: jest.fn(),
-      switchToHttp: () => ({ getRequest: () => request }),
-    } as unknown as ExecutionContext;
+class PublicController {
+  @Public()
+  publicRoute() {}
+}
+
+class ProtectedController {
+  protectedRoute() {}
+}
+
+describe('JwtAuthGuard', () => {
+  const jwtService = new JwtService({ secret: JWT_SECRET });
+  const reflector = new Reflector();
+  const guard = new JwtAuthGuard(jwtService, reflector);
+
+  function makeContext(
+    authorization: string | undefined,
+    controller: typeof PublicController | typeof ProtectedController = ProtectedController,
+    handler: Function = ProtectedController.prototype.protectedRoute,
+  ) {
+    const request: { headers: { authorization?: string }; user?: Record<string, unknown> } = {
+      headers: { authorization },
+    };
+    const context = new ExecutionContextHost([request], controller, handler);
 
     return { context, request };
-  };
+  }
 
-  beforeEach(() => {
-    jest.clearAllMocks();
-    reflector.getAllAndOverride = jest.fn().mockReturnValue(false);
-    guard = new JwtAuthGuard(jwtService, reflector);
-  });
-
-  it('should be able to accept a valid bearer token with a UUID subject', async () => {
-    const payload = { sub: '123e4567-e89b-12d3-a456-426614174000' };
-    const { context, request } = makeContext('Bearer valid-token');
-    jwtService.verifyAsync = jest.fn().mockResolvedValue(payload);
+  it('should be able to authenticate with a valid JWT', async () => {
+    const token = await jwtService.signAsync({ sub: USER_ID });
+    const { context, request } = makeContext(`Bearer ${token}`);
 
     await expect(guard.canActivate(context)).resolves.toBe(true);
-
-    expect(jwtService.verifyAsync).toHaveBeenCalledWith('valid-token');
-    expect(request).toHaveProperty('user', payload);
+    expect(request.user).toMatchObject({ sub: USER_ID });
   });
 
   it.each([
@@ -45,32 +52,50 @@ describe('JwtAuthGuard', () => {
   ])('should not be able to authenticate with %s', async (_name, authorization) => {
     const { context } = makeContext(authorization);
 
-    await expect(guard.canActivate(context)).rejects.toBeInstanceOf(UnauthorizedException);
-    expect(jwtService.verifyAsync).not.toHaveBeenCalled();
+    await expect(guard.canActivate(context)).rejects.toBeInstanceOf(
+      UnauthorizedException,
+    );
   });
 
-  it.each([
-    ['an invalid signature', new Error('invalid signature')],
-    ['an expired token', new Error('jwt expired')],
-  ])('should not be able to authenticate with %s', async (_name, error) => {
-    const { context } = makeContext('Bearer invalid-token');
-    jwtService.verifyAsync = jest.fn().mockRejectedValue(error);
+  it('should not be able to authenticate with a token signed by another secret', async () => {
+    const token = await new JwtService({ secret: 'another-secret' }).signAsync({
+      sub: USER_ID,
+    });
+    const { context } = makeContext(`Bearer ${token}`);
 
-    await expect(guard.canActivate(context)).rejects.toEqual(new UnauthorizedException());
+    await expect(guard.canActivate(context)).rejects.toBeInstanceOf(
+      UnauthorizedException,
+    );
+  });
+
+  it('should not be able to authenticate with an expired token', async () => {
+    const token = await jwtService.signAsync(
+      { sub: USER_ID },
+      { expiresIn: -1 },
+    );
+    const { context } = makeContext(`Bearer ${token}`);
+
+    await expect(guard.canActivate(context)).rejects.toBeInstanceOf(
+      UnauthorizedException,
+    );
   });
 
   it('should not be able to authenticate with a token whose subject is not a UUID', async () => {
-    const { context } = makeContext('Bearer valid-token');
-    jwtService.verifyAsync = jest.fn().mockResolvedValue({ sub: 'user-id' });
+    const token = await jwtService.signAsync({ sub: 'user-id' });
+    const { context } = makeContext(`Bearer ${token}`);
 
-    await expect(guard.canActivate(context)).rejects.toBeInstanceOf(UnauthorizedException);
+    await expect(guard.canActivate(context)).rejects.toBeInstanceOf(
+      UnauthorizedException,
+    );
   });
 
   it('should be able to bypass authentication for a public route', async () => {
-    const { context } = makeContext();
-    reflector.getAllAndOverride = jest.fn().mockReturnValue(true);
+    const { context } = makeContext(
+      undefined,
+      PublicController,
+      PublicController.prototype.publicRoute,
+    );
 
     await expect(guard.canActivate(context)).resolves.toBe(true);
-    expect(jwtService.verifyAsync).not.toHaveBeenCalled();
   });
 });
