@@ -6,8 +6,19 @@ import { BcryptHasher } from '@modules/auth/infra/cryptography/bcrypt-hasher';
 
 const ADMIN_EMAIL = 'admin@admin.com';
 
-export async function seed(): Promise<void> {
-  const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+export interface SeedOptions {
+  connectionString?: string;
+  max?: number;
+  schema?: string;
+}
+
+export async function seed(options: SeedOptions = {}): Promise<void> {
+  const searchPath = options.schema?.replaceAll('"', '""');
+  const pool = new Pool({
+    connectionString: options.connectionString ?? process.env.DATABASE_URL,
+    max: options.max,
+    options: searchPath ? `-c search_path="${searchPath}"` : undefined,
+  });
 
   try {
     const db = drizzle(pool, { schema, casing: 'snake_case' });
