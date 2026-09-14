@@ -13,7 +13,7 @@
 ## Global Constraints
 
 - Persist exactly `id`, `email`, and `password` in `users`; `password` stores only a bcrypt hash.
-- Only `POST /auth/login` is public; every existing HTTP route requires `Authorization: Bearer <JWT>`.
+- Only `POST /auth/login` is public among application routes; Swagger's `/docs` and `/docs-json` routes remain public by explicit product decision. Every other application HTTP route requires `Authorization: Bearer <JWT>`.
 - JWT payload is `{ sub: userId }` and lifetime is fixed at 24 hours.
 - Only `JWT_SECRET` is added to environment configuration; token duration is not configurable.
 - No user-creation route, refresh token, logout, roles, or permissions.
@@ -226,7 +226,7 @@
 **Files:**
 - Create: `apps/server/src/infra/database/drizzle/seed.ts`
 - Modify: `apps/server/package.json`
-- Create: `apps/server/src/infra/database/drizzle/seed.spec.ts`
+- Create: `apps/server/src/infra/database/drizzle/seed.e2e-spec.ts`
 - Modify: `apps/server/.env.test` if the test environment needs the JWT secret
 
 **Interfaces:**
@@ -239,7 +239,7 @@
 
 - [ ] **Step 2: Run the focused test and verify the expected failure**
 
-  Run `bun test apps/server/src/infra/database/drizzle/seed.spec.ts`; it must fail because the seed does not exist.
+  Run `bun test apps/server/src/infra/database/drizzle/seed.e2e-spec.ts`; it must fail because the seed does not exist.
 
 - [ ] **Step 3: Implement the seed and command**
 
@@ -268,7 +268,7 @@
 
 - [ ] **Step 3: Verify security invariants manually**
 
-  Confirm no response or log exposes the stored password, invalid email and wrong password return indistinguishable unauthorized responses, JWT expiration is 24 hours, only login is public, and the admin seed remains idempotent.
+  Confirm no response or log exposes the stored password, invalid email and wrong password return indistinguishable unauthorized responses, JWT expiration is 24 hours, only application login plus the explicit Swagger routes are public, and the admin seed remains idempotent.
 
 - [ ] **Step 4: Request an independent code review**
 

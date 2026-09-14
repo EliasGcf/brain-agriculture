@@ -11,7 +11,7 @@ Add simple internal-user authentication to the server. Users are created only by
 - `password` is the bcrypt hash; plaintext passwords are accepted only at the authentication boundary and seed input, then discarded.
 - Email is normalized to trimmed lowercase and is unique.
 - There is no user-creation HTTP route, refresh token, logout, roles, or permissions in this iteration.
-- `POST /auth/login` is the only public route.
+- `POST /auth/login` is the only public application route. Swagger documentation routes (`/docs` and `/docs-json`) remain public by explicit product decision.
 - All existing HTTP routes are protected by a global JWT guard.
 - JWT payload contains only `sub`, with the user's UUID.
 - JWT lifetime is fixed at 24 hours in application configuration.
@@ -69,4 +69,4 @@ All test descriptions follow the repository convention: positive behavior uses `
 
 ## Consequences
 
-The existing API becomes authenticated immediately after this change. Existing clients must obtain a token through `POST /auth/login` and send it as a bearer token. A future role/permission model, refresh-token flow, account lifecycle, or token revocation mechanism is intentionally deferred.
+The existing application API becomes authenticated immediately after this change, while the Swagger documentation routes remain publicly accessible. Existing clients must obtain a token through `POST /auth/login` and send it as a bearer token. A future role/permission model, refresh-token flow, account lifecycle, or token revocation mechanism is intentionally deferred.
