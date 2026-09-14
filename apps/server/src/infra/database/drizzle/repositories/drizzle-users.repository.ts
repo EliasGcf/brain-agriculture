@@ -6,7 +6,7 @@ import { type DB, DRIZZLE } from '@infra/database/drizzle/drizzle.constants';
 import { User } from '@modules/auth/domain/entities/user';
 import { UsersRepository } from '@modules/auth/domain/repositories/users.repository';
 
-import { DrizzleUserMapper } from './drizzle-user.mapper';
+import { DrizzleUserMapper } from '../mappers/drizzle-user.mapper';
 
 @Injectable()
 export class DrizzleUsersRepository implements UsersRepository {

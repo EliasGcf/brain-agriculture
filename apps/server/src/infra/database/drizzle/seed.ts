@@ -1,28 +1,20 @@
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
 
-import { schema } from './schema';
-import { BcryptHasher } from '@modules/auth/infra/cryptography/bcrypt-hasher';
+import { BcryptHasher } from '@infra/cryptography/bcrypt-hasher';
+import { schema } from "@infra/database/drizzle/schema";
 
 const ADMIN_EMAIL = 'admin@admin.com';
+const ADMIN_PASSWORD = '12345678';
 
-export interface SeedOptions {
-  connectionString?: string;
-  max?: number;
-  schema?: string;
-}
+if (!process.env.DATABASE_URL) throw new Error('DATABASE_URL is required.');
 
-export async function seed(options: SeedOptions = {}): Promise<void> {
-  const searchPath = options.schema?.replaceAll('"', '""');
-  const pool = new Pool({
-    connectionString: options.connectionString ?? process.env.DATABASE_URL,
-    max: options.max,
-    options: searchPath ? `-c search_path="${searchPath}"` : undefined,
-  });
+async function seed(): Promise<void> {
+  const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
   try {
     const db = drizzle(pool, { schema, casing: 'snake_case' });
-    const password = await new BcryptHasher().hash('12345678');
+    const password = await new BcryptHasher().hash(ADMIN_PASSWORD);
 
     await db
       .insert(schema.users)
@@ -36,9 +28,13 @@ export async function seed(options: SeedOptions = {}): Promise<void> {
   }
 }
 
-if (process.argv[1]?.endsWith('/seed.ts')) {
-  seed().catch((error: unknown) => {
-    console.error(error);
-    process.exitCode = 1;
+seed()
+  .then(() => {
+    console.log('Database seeded successfully.');
+    process.exit(0);
+  })
+  .catch((error) => {
+    console.error('Error seeding database:', error);
+    process.exit(1);
   });
-}
+

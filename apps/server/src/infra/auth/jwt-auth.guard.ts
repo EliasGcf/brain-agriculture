@@ -9,7 +9,8 @@ import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { z } from 'zod';
 
-import { PUBLIC_ROUTE } from './public.decorator';
+import { IS_PUBLIC_KEY } from "@infra/auth/public.decorator";
+
 
 type AuthenticatedRequest = Request & {
   user?: Record<string, unknown>;
@@ -23,7 +24,7 @@ export class JwtAuthGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const isPublic = this.reflector.getAllAndOverride<boolean>(PUBLIC_ROUTE, [
+    const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
       context.getHandler(),
       context.getClass(),
     ]);

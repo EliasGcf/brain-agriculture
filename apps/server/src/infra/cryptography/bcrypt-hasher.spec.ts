@@ -1,4 +1,4 @@
-import { BcryptHasher } from '@modules/auth/infra/cryptography/bcrypt-hasher';
+import { BcryptHasher } from '@infra/cryptography/bcrypt-hasher';
 
 describe('BcryptHasher', () => {
   it('should be able to hash a password without returning the plaintext', async () => {

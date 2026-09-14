@@ -3,7 +3,7 @@ import { eq } from 'drizzle-orm';
 
 import { DrizzleModule } from '@infra/database/drizzle/drizzle.module';
 import { schema } from '@infra/database/drizzle/schema';
-import { DrizzleUsersRepository } from '@modules/auth/infra/database/drizzle-users.repository';
+import { DrizzleUsersRepository } from '@infra/database/drizzle/repositories/drizzle-users.repository';
 import { UsersRepository } from '@modules/auth/domain/repositories/users.repository';
 import { makeUser } from '@test/factories/make-user.factory';
 

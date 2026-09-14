@@ -2,18 +2,18 @@ import { Inject, Injectable, Module } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Test } from '@nestjs/testing';
 
+import { AuthModule } from '@infra/auth/auth.module';
 import { Encrypter } from '@modules/auth/application/cryptography/encrypter';
 import { HashComparer } from '@modules/auth/application/cryptography/hash-comparer';
 import { HashGenerator } from '@modules/auth/application/cryptography/hash-generator';
 import { EnvService } from '@infra/env/env.service';
+import { CryptographyModule } from './cryptography.module';
 
 process.env.DATABASE_URL = 'postgresql://postgres:postgres@localhost:5432/tests';
 process.env.JWT_SECRET = 'test-secret';
 
 describe('CryptographyModule', () => {
   it('should be able to resolve cryptography contracts and sign and verify a token', async () => {
-    const { CryptographyModule } = require('./cryptography.module') as typeof import('./cryptography.module');
-
     @Injectable()
     class Consumer {
       constructor(
@@ -24,7 +24,11 @@ describe('CryptographyModule', () => {
       ) {}
     }
 
-    @Module({ imports: [CryptographyModule], providers: [Consumer], exports: [Consumer] })
+    @Module({
+      imports: [AuthModule, CryptographyModule],
+      providers: [Consumer],
+      exports: [Consumer],
+    })
     class ConsumerModule {}
 
     const moduleRef = await Test.createTestingModule({

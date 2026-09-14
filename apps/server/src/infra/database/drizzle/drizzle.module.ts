@@ -3,7 +3,7 @@ import { DrizzleFarmsRepository } from '@infra/database/drizzle/repositories/dri
 import { DrizzleHarvestsRepository } from '@infra/database/drizzle/repositories/drizzle-harvests.repository';
 import { DrizzlePlantedCropsRepository } from '@infra/database/drizzle/repositories/drizzle-planted-crops.repository';
 import { DrizzleProducersRepository } from '@infra/database/drizzle/repositories/drizzle-producers.repository';
-import { DrizzleUsersRepository } from '@modules/auth/infra/database/drizzle-users.repository';
+import { DrizzleUsersRepository } from '@infra/database/drizzle/repositories/drizzle-users.repository';
 import { schema } from '@infra/database/drizzle/schema';
 import { EnvModule } from '@infra/env/env.module';
 import { EnvService } from '@infra/env/env.service';

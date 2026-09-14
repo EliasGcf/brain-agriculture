@@ -3,7 +3,7 @@ import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { z } from 'zod';
 
 import { AuthenticateUserUseCase } from '@modules/auth/application/use-cases/authenticate-user.use-case';
-import { Public } from '@modules/auth/infra/http/public.decorator';
+import { Public } from '@infra/auth/public.decorator';
 
 const AuthenticateUserSchema = z.object({
   email: z.string().trim().toLowerCase().email(),
