@@ -56,5 +56,5 @@ _Avoid_: Unused area
 - The state dashboard groups total farm hectares by state; the crop dashboard groups distinct farm counts by planted crop; the land-use dashboard uses farm arable, vegetation, and other-use areas.
 - A farm without harvests or planted crops still contributes to farm, hectare, state, and land-use totals, but not to crop counts.
 - Deletion is physical in this version; a future historical/audit requirement should favor soft-delete.
-- User accounts and authentication are outside the initial domain scope.
+- Internal user accounts belong to the system's access-control boundary and are distinct from producers. Accounts are created by infrastructure seed, authenticate with email and password, and receive a 24-hour JWT; role and permission management are outside the current scope.
 - Main domain records keep creation and last-update timestamps; historical auditing is outside this version.
