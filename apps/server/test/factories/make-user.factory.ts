@@ -7,7 +7,7 @@ type Overrides = Partial<{
   password: string;
 }>;
 
-export function makeUser(overrides: Overrides = {}) {
+export function makeUserFactory(overrides: Overrides = {}) {
   return User.create({
     email: overrides.email ?? faker.internet.email(),
     password: overrides.password ?? faker.internet.password(),
