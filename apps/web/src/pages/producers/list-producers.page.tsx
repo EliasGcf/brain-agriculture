@@ -13,7 +13,7 @@ import { RetryCard } from '@components/retry-card';
 
 import { ProducersTable } from './components/producers-table';
 
-const PAGE_SIZE = 10;
+export const PAGE_SIZE = 10;
 
 export function ListProducersPage() {
   const navigate = useNavigate();

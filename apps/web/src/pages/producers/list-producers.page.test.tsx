@@ -2,13 +2,22 @@ import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { http, HttpResponse } from 'msw'
 import { MemoryRouter } from 'react-router'
 
-import { ListProducersPage } from './list-producers.page'
+import { ListProducersPage, PAGE_SIZE } from './list-producers.page'
 import { makeProducer, mockData } from '../../../tests/mocks/data'
 import { server } from '../../../tests/mocks/server'
 import { renderWithProviders } from '../../../tests/test-utils'
 
 const baseUrl = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/+$/, '')
 const producersUrl = `${baseUrl}/producers`
+
+function makePageRecords(prefix: string, count = PAGE_SIZE + 1) {
+  return Array.from({ length: count }, (_, index) =>
+    makeProducer({
+      id: `00000000-0000-4000-8000-${String(index + 11).padStart(12, '0')}`,
+      name: `${prefix} ${index + 1} Rural`,
+    }),
+  )
+}
 
 function renderProducers() {
   window.history.replaceState({}, '', '/producers')
@@ -65,19 +74,14 @@ describe('producers page', () => {
   })
 
   it('should be able to move through pages provided by the API', async () => {
-    const records = [
-      makeProducer({ id: '00000000-0000-4000-8000-000000000011', name: 'Page One Rural' }),
-      makeProducer({ id: '00000000-0000-4000-8000-000000000012', name: 'Page Two Rural' }),
-      makeProducer({ id: '00000000-0000-4000-8000-000000000013', name: 'Page Three Rural' }),
-      makeProducer({ id: '00000000-0000-4000-8000-000000000014', name: 'Page Four Rural' }),
-      makeProducer({ id: '00000000-0000-4000-8000-000000000015', name: 'Page Five Rural' }),
-    ]
+    const records = makePageRecords('Page')
     server.use(
       http.get(producersUrl, ({ request }) => {
         const page = Number(new URL(request.url).searchParams.get('page') ?? 1)
-        const start = (page - 1) * 4
+        const perPage = Number(new URL(request.url).searchParams.get('perPage') ?? PAGE_SIZE)
+        const start = (page - 1) * perPage
         return HttpResponse.json({
-          items: records.slice(start, start + 4).map((item) => ({ ...item, farmsCount: 0 })),
+          items: records.slice(start, start + perPage).map((item) => ({ ...item, farmsCount: 0 })),
           total: records.length,
         })
       }),
@@ -85,31 +89,26 @@ describe('producers page', () => {
 
     renderProducers()
 
-    expect(await screen.findByText('Page One Rural')).toBeInTheDocument()
+    expect(await screen.findByText('Page 1 Rural')).toBeInTheDocument()
     expect(screen.getByText('Página 1 de 2')).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Próxima página' }))
 
-    expect(await screen.findByText('Page Five Rural')).toBeInTheDocument()
+    expect(await screen.findByText(`Page ${PAGE_SIZE + 1} Rural`)).toBeInTheDocument()
     expect(screen.getByText('Página 2 de 2')).toBeInTheDocument()
   })
 
   it('should be able to keep the producer search and page in the URL', async () => {
-    const records = [
-      makeProducer({ id: '00000000-0000-4000-8000-000000000031', name: 'URL One Rural' }),
-      makeProducer({ id: '00000000-0000-4000-8000-000000000032', name: 'URL Two Rural' }),
-      makeProducer({ id: '00000000-0000-4000-8000-000000000033', name: 'URL Three Rural' }),
-      makeProducer({ id: '00000000-0000-4000-8000-000000000034', name: 'URL Four Rural' }),
-      makeProducer({ id: '00000000-0000-4000-8000-000000000035', name: 'URL Five Rural' }),
-    ]
+    const records = makePageRecords('URL')
     server.use(
       http.get(producersUrl, ({ request }) => {
         const url = new URL(request.url)
         const page = Number(url.searchParams.get('page') ?? 1)
+        const perPage = Number(url.searchParams.get('perPage') ?? PAGE_SIZE)
         const query = url.searchParams.get('name')
         const filtered = query ? records.filter((record) => record.name.includes(query)) : records
-        const start = (page - 1) * 4
+        const start = (page - 1) * perPage
         return HttpResponse.json({
-          items: filtered.slice(start, start + 4).map((item) => ({ ...item, farmsCount: 0 })),
+          items: filtered.slice(start, start + perPage).map((item) => ({ ...item, farmsCount: 0 })),
           total: filtered.length,
         })
       }),
@@ -123,27 +122,26 @@ describe('producers page', () => {
     fireEvent.submit(screen.getByRole('form', { name: 'Buscar produtores' }))
 
     await waitFor(() => expect(window.location.search).toBe('?name=URL&document=529.982.247-25'))
-    expect(await screen.findByText('URL One Rural')).toBeInTheDocument()
+    expect(await screen.findByText('URL 1 Rural')).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Próxima página' }))
 
     await waitFor(() => expect(window.location.search).toBe('?name=URL&document=529.982.247-25&page=2'))
-    expect(await screen.findByText('URL Five Rural')).toBeInTheDocument()
+    expect(await screen.findByText(`URL ${PAGE_SIZE + 1} Rural`)).toBeInTheDocument()
   })
 
   it('should be able to return to the last valid page after deleting its sole row', async () => {
-    const records = [
-      makeProducer({ id: '00000000-0000-4000-8000-000000000021', name: 'Page Six Rural' }),
-      makeProducer({ id: '00000000-0000-4000-8000-000000000022', name: 'Page Seven Rural' }),
-    ]
+    const records = makePageRecords('Page', PAGE_SIZE - 2)
+    const lastRecord = records.at(-1)!
     const requestedPages: number[] = []
     mockData.producers.push(...records)
     server.use(
       http.get(producersUrl, ({ request }) => {
         const page = Number(new URL(request.url).searchParams.get('page') ?? 1)
+        const perPage = Number(new URL(request.url).searchParams.get('perPage') ?? PAGE_SIZE)
         requestedPages.push(page)
-        const start = (page - 1) * 4
+        const start = (page - 1) * perPage
         return HttpResponse.json({
-          items: mockData.producers.slice(start, start + 4).map((item) => ({ ...item, farmsCount: 0 })),
+          items: mockData.producers.slice(start, start + perPage).map((item) => ({ ...item, farmsCount: 0 })),
           total: mockData.producers.length,
         })
       }),
@@ -152,14 +150,14 @@ describe('producers page', () => {
     renderProducers()
 
     fireEvent.click(await screen.findByRole('button', { name: 'Próxima página' }))
-    expect(await screen.findByText('Page Seven Rural')).toBeInTheDocument()
-    fireEvent.click(screen.getByRole('button', { name: 'Ações de Page Seven Rural' }))
+    expect(await screen.findByText(lastRecord.name)).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: `Ações de ${lastRecord.name}` }))
     fireEvent.click(screen.getByRole('menuitem', { name: 'Excluir' }))
     fireEvent.click(screen.getByRole('button', { name: /^Excluir produtor$/ }))
 
     expect(await screen.findByText('Ada Rural')).toBeInTheDocument()
     expect(requestedPages).toContain(1)
-    expect(screen.queryByText('Page Seven Rural')).not.toBeInTheDocument()
+    expect(screen.queryByText(lastRecord.name)).not.toBeInTheDocument()
   })
 
   it('should be able to retry after the producer API fails', async () => {
