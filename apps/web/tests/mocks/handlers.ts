@@ -13,6 +13,7 @@ import type {
 import {
   makeFarm,
   makeHarvest,
+  makeDocumentResponse,
   makePlantedCrop,
   makeProducer,
   mockData,
@@ -25,6 +26,14 @@ const route = (path: string) => `${baseUrl}${path}`;
 const notFound = () => HttpResponse.json({ message: 'Not found' }, { status: 404 });
 const parseBody = async <T>(request: Request): Promise<T> => (await request.json()) as T;
 
+/**
+ * We are creating the handlers manually,
+ * but there are tools that can generate them automatically from OpenAPI,
+ * such as https://orval.dev/docs/guides/msw/#basic-setup.
+ *
+ * However, since this project is already using RTK Query with its own codegen,
+ * I don't see the point in adding another codegen tool, especially since Orval does not support RTK Query.
+ */
 export const handlers = [
   http.get(route('/producers'), ({ request }) => {
     const url = new URL(request.url);
@@ -34,15 +43,20 @@ export const handlers = [
     const perPage = Number(url.searchParams.get('perPage') ?? 10);
     const filtered = mockData.producers.filter((item) =>
       (!name || item.name.toLowerCase().includes(name)) &&
-      (!document || item.document.includes(document)),
+      (!document || item.document.value.includes(document)),
     );
     const start = Math.max(0, page - 1) * perPage;
-    return HttpResponse.json({ items: filtered.slice(start, start + perPage), total: filtered.length });
+    const items = filtered.slice(start, start + perPage).map((producer) => ({
+      ...producer,
+      farmsCount: mockData.farms.filter((farm) => farm.producerId === producer.id).length,
+    }));
+    return HttpResponse.json({ items, total: filtered.length });
   }),
   http.post(route('/producers'), async ({ request }) => {
     const body = await parseBody<CreateProducerApiArg['body']>(request);
     const record = makeProducer({
       ...body,
+      document: makeDocumentResponse(body.document!),
       id: nextMockId('producers'),
     });
     mockData.producers.push(record);
@@ -55,8 +69,31 @@ export const handlers = [
   http.patch(route('/producers/:id'), async ({ params, request }) => {
     const record = mockData.producers.find((item) => item.id === params.id);
     if (!record) return notFound();
-    Object.assign(record, await parseBody<UpdateProducerApiArg['body']>(request));
+    const body = await parseBody<UpdateProducerApiArg['body']>(request);
+    Object.assign(record, {
+      ...body,
+      ...(body.document
+        ? {
+            document: {
+              ...makeDocumentResponse(body.document),
+            },
+          }
+        : {}),
+    });
     return HttpResponse.json(record);
+  }),
+  http.delete(route('/producers/:id'), ({ params }) => {
+    const index = mockData.producers.findIndex((item) => item.id === params.id);
+    if (index < 0) return notFound();
+    if (mockData.farms.some((farm) => farm.producerId === params.id)) {
+      return HttpResponse.json({ message: 'Producer has farms' }, { status: 403 });
+    }
+    mockData.producers.splice(index, 1);
+    return new HttpResponse(null, { status: 204 });
+  }),
+  http.get(route('/producers/:producerId/farms'), ({ params }) => {
+    const records = mockData.farms.filter((farm) => farm.producerId === params.producerId);
+    return HttpResponse.json(records);
   }),
 
   http.post(route('/farms'), async ({ request }) => {
@@ -90,6 +127,10 @@ export const handlers = [
     );
     return new HttpResponse(null, { status: 204 });
   }),
+  http.get(route('/farms/:farmId/harvests'), ({ params }) => {
+    const records = mockData.harvests.filter((harvest) => harvest.farmId === params.farmId);
+    return HttpResponse.json(records);
+  }),
 
   http.post(route('/harvests'), async ({ request }) => {
     const record = makeHarvest({
@@ -117,6 +158,12 @@ export const handlers = [
       (item) => item.harvestId !== params.id,
     );
     return new HttpResponse(null, { status: 204 });
+  }),
+  http.get(route('/harvests/:harvestId/planted-crops'), ({ params }) => {
+    const records = mockData.plantedCrops.filter(
+      (plantedCrop) => plantedCrop.harvestId === params.harvestId,
+    );
+    return HttpResponse.json(records);
   }),
 
   http.post(route('/planted-crops'), async ({ request }) => {

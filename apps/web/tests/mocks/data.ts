@@ -4,14 +4,36 @@ import type {
   PlantedCropResponse,
   ProducerResponse,
 } from '../../src/store/api.generated';
+import { cnpj, cpf } from 'cpf-cnpj-validator';
 
-const producer = (overrides: Partial<ProducerResponse> = {}): ProducerResponse => ({
-  id: '00000000-0000-4000-8000-000000000001',
-  name: 'Ada Rural',
-  document: '52998224725',
-  createdAt: '2026-01-01T00:00:00.000Z',
-  ...overrides,
-});
+export const makeDocumentResponse = (value: string): ProducerResponse['document'] => {
+  const normalized = cnpj.strip(value).toLowerCase()
+  const isCpf = normalized.length === 11
+  return {
+    type: isCpf ? 'cpf' : 'cnpj',
+    value: normalized,
+    formatted: isCpf ? cpf.format(normalized) : cnpj.format(normalized),
+  }
+}
+
+type ProducerOverrides = Omit<Partial<ProducerResponse>, 'document'> & {
+  document?: string | ProducerResponse['document']
+}
+
+const producer = (overrides: ProducerOverrides = {}): ProducerResponse => {
+  const document = overrides.document ?? '52998224725'
+  const documentResponse = typeof document === 'string'
+    ? makeDocumentResponse(document)
+    : document
+  const { document: _document, ...otherOverrides } = overrides
+  return {
+    id: '00000000-0000-4000-8000-000000000001',
+    name: 'Ada Rural',
+    document: documentResponse,
+    createdAt: '2026-01-01T00:00:00.000Z',
+    ...otherOverrides,
+  }
+}
 
 const farm = (overrides: Partial<FarmResponse> = {}): FarmResponse => ({
   id: '00000000-0000-4000-8000-000000000002',
@@ -67,7 +89,19 @@ export const nextMockId = (collection: MockCollection): string => {
 };
 
 const initialData = {
-  producers: [producer()],
+  producers: [
+    producer(),
+    producer({
+      id: '00000000-0000-4000-8000-000000000005',
+      name: 'Bruno Rural',
+      document: '39053344705',
+    }),
+    producer({
+      id: '00000000-0000-4000-8000-000000000006',
+      name: 'Cora Rural',
+      document: '11144477735',
+    }),
+  ],
   farms: [farm()],
   harvests: [harvest()],
   plantedCrops: [plantedCrop()],

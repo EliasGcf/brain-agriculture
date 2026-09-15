@@ -1,4 +1,3 @@
-import { describe, expect, it } from 'vitest';
 import { http, HttpResponse } from 'msw';
 
 import { api } from './api.generated';
@@ -11,8 +10,155 @@ describe('MSW API integration', () => {
       api.endpoints.listProducers.initiate({ page: 1, perPage: 10 }),
     ).unwrap();
 
-    expect(result.items).toHaveLength(1);
-    expect(result.items[0].name).toBe('Ada Rural');
+    expect(result.items).toHaveLength(3);
+    expect(result.total).toBe(3);
+    expect(result.items[0].document).toEqual({
+      type: 'cpf',
+      value: '52998224725',
+      formatted: '529.982.247-25',
+    });
+    expect(result.items.map((item) => item.name)).toEqual([
+      'Ada Rural',
+      'Bruno Rural',
+      'Cora Rural',
+    ]);
+  });
+
+  it('should be able to paginate producers in deterministic order', async () => {
+    const firstPage = await apiStore.dispatch(
+      api.endpoints.listProducers.initiate({ page: 1, perPage: 2 }),
+    ).unwrap();
+    const secondPage = await apiStore.dispatch(
+      api.endpoints.listProducers.initiate({ page: 2, perPage: 2 }),
+    ).unwrap();
+
+    expect(firstPage.total).toBe(3);
+    expect(firstPage.items.map((item) => item.name)).toEqual([
+      'Ada Rural',
+      'Bruno Rural',
+    ]);
+    expect(secondPage.items.map((item) => item.name)).toEqual(['Cora Rural']);
+  });
+
+  it('should be able to list farms by producer through an RTK Query endpoint', async () => {
+    const result = await apiStore.dispatch(
+      api.endpoints.listFarmsByProducer.initiate({
+        producerId: '00000000-0000-4000-8000-000000000001',
+      }),
+    ).unwrap();
+
+    expect(result[0]).toMatchObject({
+      producerId: '00000000-0000-4000-8000-000000000001',
+    });
+  });
+
+  it('should be able to list an empty relationship collection for an unknown parent', async () => {
+    await expect(
+      apiStore.dispatch(
+        api.endpoints.listHarvestsByFarm.initiate({
+          farmId: '00000000-0000-4000-8000-999999999999',
+        }),
+      ).unwrap(),
+    ).resolves.toEqual([]);
+  });
+
+  it('should be able to list planted crops by harvest through an RTK Query endpoint', async () => {
+    const result = await apiStore.dispatch(
+      api.endpoints.listPlantedCropsByHarvest.initiate({
+        harvestId: '00000000-0000-4000-8000-000000000003',
+      }),
+    ).unwrap();
+
+    expect(result[0]).toMatchObject({
+      harvestId: '00000000-0000-4000-8000-000000000003',
+    });
+  });
+
+  it('should not be able to delete a producer that has farms', async () => {
+    const result = await apiStore.dispatch(
+      api.endpoints.deleteProducer.initiate({
+        id: '00000000-0000-4000-8000-000000000001',
+      }),
+    );
+
+    expect(result).toMatchObject({ error: { status: 403 } });
+  });
+
+  it('should be able to delete a producer without farms', async () => {
+    const producer = await apiStore.dispatch(
+      api.endpoints.createProducer.initiate({
+        body: { name: 'Producer Without Farms', document: '39053344705' },
+      }),
+    ).unwrap();
+
+    await expect(
+      apiStore.dispatch(api.endpoints.deleteProducer.initiate({ id: producer.id })).unwrap(),
+    ).resolves.toBeNull();
+
+    await expect(
+      apiStore.dispatch(api.endpoints.getProducerById.initiate({ id: producer.id })).unwrap(),
+    ).rejects.toMatchObject({ status: 404 });
+  });
+
+  it('should not be able to delete a missing producer', async () => {
+    const result = await apiStore.dispatch(
+      api.endpoints.deleteProducer.initiate({
+        id: '00000000-0000-4000-8000-999999999999',
+      }),
+    );
+
+    expect(result).toMatchObject({ error: { status: 404 } });
+  });
+
+  it('should calculate producer farmsCount from the farm collection', async () => {
+    const initial = await apiStore.dispatch(
+      api.endpoints.listProducers.initiate({ page: 1, perPage: 10 }),
+    ).unwrap();
+
+    expect(initial.items[0]).toMatchObject({
+      id: '00000000-0000-4000-8000-000000000001',
+      farmsCount: 1,
+    });
+    expect(initial.items[1]).toMatchObject({
+      id: '00000000-0000-4000-8000-000000000005',
+      farmsCount: 0,
+    });
+
+    const farm = await apiStore.dispatch(
+      api.endpoints.createFarm.initiate({
+        body: {
+          name: 'Second Ada Farm',
+          producerId: '00000000-0000-4000-8000-000000000001',
+          city: 'Salvador',
+          state: 'BA',
+          totalArea: 80,
+          arableArea: 40,
+          vegetationArea: 20,
+        },
+      }),
+    ).unwrap();
+
+    const afterCreate = await apiStore.dispatch(
+      api.endpoints.listProducers.initiate(
+        { page: 1, perPage: 10 },
+        { forceRefetch: true },
+      ),
+    ).unwrap();
+
+    expect(afterCreate.items[0]).toMatchObject({ farmsCount: 2 });
+    expect(afterCreate.items[1]).toMatchObject({ farmsCount: 0 });
+
+    await apiStore.dispatch(api.endpoints.deleteFarm.initiate({ id: farm.id })).unwrap();
+
+    const afterDelete = await apiStore.dispatch(
+      api.endpoints.listProducers.initiate(
+        { page: 1, perPage: 10 },
+        { forceRefetch: true },
+      ),
+    ).unwrap();
+
+    expect(afterDelete.items[0]).toMatchObject({ farmsCount: 1 });
+    expect(afterDelete.items[1]).toMatchObject({ farmsCount: 0 });
   });
 
   it('should be able to execute a producer mutation through an RTK Query endpoint', async () => {
@@ -23,7 +169,42 @@ describe('MSW API integration', () => {
     ).unwrap();
 
     expect(result.name).toBe('New Producer');
-    expect(result.document).toBe('52998224725');
+    expect(result.document).toMatchObject({
+      type: 'cpf',
+      value: '52998224725',
+      formatted: '529.982.247-25',
+    });
+  });
+
+  it('should be able to update a producer with a string request document and nested response document', async () => {
+    const result = await apiStore.dispatch(
+      api.endpoints.updateProducer.initiate({
+        id: '00000000-0000-4000-8000-000000000005',
+        body: { name: 'Bruno Atualizado', document: '11.222.333/0001-81' },
+      }),
+    ).unwrap();
+
+    expect(result.document).toEqual({
+      type: 'cnpj',
+      value: '11222333000181',
+      formatted: '11.222.333/0001-81',
+    });
+  });
+
+  it('should be able to update a producer without replacing its document', async () => {
+    const result = await apiStore.dispatch(
+      api.endpoints.updateProducer.initiate({
+        id: '00000000-0000-4000-8000-000000000001',
+        body: { name: 'Ada Atualizada' },
+      }),
+    ).unwrap();
+
+    expect(result.name).toBe('Ada Atualizada');
+    expect(result.document).toEqual({
+      type: 'cpf',
+      value: '52998224725',
+      formatted: '529.982.247-25',
+    });
   });
 
   it('should not be able to fetch a missing producer', async () => {

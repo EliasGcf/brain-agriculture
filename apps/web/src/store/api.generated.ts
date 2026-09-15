@@ -38,6 +38,35 @@ const injectedRtkApi = api.injectEndpoints({
         body: queryArg.body,
       }),
     }),
+    deleteProducer: build.mutation<
+      DeleteProducerApiResponse,
+      DeleteProducerApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/producers/${queryArg.id}`,
+        method: "DELETE",
+      }),
+    }),
+    listFarmsByProducer: build.query<
+      ListFarmsByProducerApiResponse,
+      ListFarmsByProducerApiArg
+    >({
+      query: (queryArg) => ({ url: `/producers/${queryArg.producerId}/farms` }),
+    }),
+    listHarvestsByFarm: build.query<
+      ListHarvestsByFarmApiResponse,
+      ListHarvestsByFarmApiArg
+    >({
+      query: (queryArg) => ({ url: `/farms/${queryArg.farmId}/harvests` }),
+    }),
+    listPlantedCropsByHarvest: build.query<
+      ListPlantedCropsByHarvestApiResponse,
+      ListPlantedCropsByHarvestApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/harvests/${queryArg.harvestId}/planted-crops`,
+      }),
+    }),
     createFarm: build.mutation<CreateFarmApiResponse, CreateFarmApiArg>({
       query: (queryArg) => ({
         url: `/farms`,
@@ -159,6 +188,24 @@ export type UpdateProducerApiArg = {
     document?: string;
   };
 };
+export type DeleteProducerApiResponse = unknown;
+export type DeleteProducerApiArg = {
+  id: string;
+};
+export type ListFarmsByProducerApiResponse = /** status 200  */ FarmResponse[];
+export type ListFarmsByProducerApiArg = {
+  producerId: string;
+};
+export type ListHarvestsByFarmApiResponse =
+  /** status 200  */ HarvestResponse[];
+export type ListHarvestsByFarmApiArg = {
+  farmId: string;
+};
+export type ListPlantedCropsByHarvestApiResponse =
+  /** status 200  */ PlantedCropResponse[];
+export type ListPlantedCropsByHarvestApiArg = {
+  harvestId: string;
+};
 export type CreateFarmApiResponse = /** status 201  */ FarmResponse;
 export type CreateFarmApiArg = {
   body: {
@@ -242,15 +289,24 @@ export type DeletePlantedCropApiArg = {
 export type ProducerResponse = {
   id: string;
   name: string;
-  document: string;
+  document: {
+    type: "cpf" | "cnpj";
+    value: string;
+    formatted: string;
+  };
   createdAt: string;
 };
 export type PaginatedProducerResponse = {
   items: {
     id: string;
     name: string;
-    document: string;
+    document: {
+      type: "cpf" | "cnpj";
+      value: string;
+      formatted: string;
+    };
     createdAt: string;
+    farmsCount: number;
   }[];
   total: number;
 };
@@ -282,6 +338,10 @@ export const {
   useListProducersQuery,
   useGetProducerByIdQuery,
   useUpdateProducerMutation,
+  useDeleteProducerMutation,
+  useListFarmsByProducerQuery,
+  useListHarvestsByFarmQuery,
+  useListPlantedCropsByHarvestQuery,
   useCreateFarmMutation,
   useGetFarmByIdQuery,
   useUpdateFarmMutation,

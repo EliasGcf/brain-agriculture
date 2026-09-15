@@ -34,7 +34,7 @@ function renderNavigation() {
 describe('sidebar navigation', () => {
   it.each([
     ['Dashboard', '/'],
-    ['Produtores', '/produtores'],
+    ['Produtores', '/producers'],
     ['Fazendas', '/farms'],
   ])('should be able to navigate to %s', (label, path) => {
     renderNavigation()
