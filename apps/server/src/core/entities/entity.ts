@@ -28,7 +28,7 @@ export abstract class Entity<Props extends z.ZodType> {
 
   public equals(entity: Entity<z.ZodType>) {
     if (entity === this) return true;
-    if (entity.id === this.id) return true;
+    if (entity.id.equals(this.id)) return true;
     return false;
   }
 }
