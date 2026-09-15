@@ -1,11 +1,19 @@
 import { InMemoryProducersRepository } from './in-memory-producers.repository';
 import { makeProducer } from '../factories/make-producer.factory';
+import { makeFarm } from '../factories/make-farm.factory';
+import { InMemoryFarmsRepository } from './in-memory-farms.repository';
+import { InMemoryHarvestsRepository } from './in-memory-harvests.repository';
+import { InMemoryPlantedCropsRepository } from './in-memory-planted-crops.repository';
 
 describe('InMemoryProducersRepository', () => {
   let repository: InMemoryProducersRepository;
+  let farmsRepository: InMemoryFarmsRepository;
 
   beforeEach(() => {
-    repository = new InMemoryProducersRepository();
+    const plantedCropsRepository = new InMemoryPlantedCropsRepository();
+    const harvestsRepository = new InMemoryHarvestsRepository(plantedCropsRepository);
+    farmsRepository = new InMemoryFarmsRepository(harvestsRepository);
+    repository = new InMemoryProducersRepository(farmsRepository);
   });
 
   it('should be able to save and find a producer by id', async () => {
@@ -22,7 +30,7 @@ describe('InMemoryProducersRepository', () => {
     const result = await repository.findMany({ name: 'sil', page: 1, perPage: 10 });
 
     expect(result.items).toHaveLength(1);
-    expect(result.items[0].name).toBe('Maria Silva');
+    expect(result.items[0].producer.name).toBe('Maria Silva');
     expect(result.total).toBe(1);
   });
 
@@ -39,6 +47,20 @@ describe('InMemoryProducersRepository', () => {
 
     const result = await repository.findMany({ page: 1, perPage: 10 });
 
-    expect(result.items.map((item) => item.name)).toEqual(['Newer', 'Older']);
+    expect(result.items.map((item) => item.producer.name)).toEqual(['Newer', 'Older']);
+  });
+
+  it('should be able to count farms for each producer', async () => {
+    const producer = makeProducer();
+    repository.items = [producer];
+    farmsRepository.items = [
+      makeFarm({ producerId: producer.id.toString() }),
+      makeFarm({ producerId: producer.id.toString() }),
+      makeFarm({ producerId: 'another-producer' }),
+    ];
+
+    const result = await repository.findMany({ page: 1, perPage: 10 });
+
+    expect(result.items[0].farmsCount).toBe(2);
   });
 });

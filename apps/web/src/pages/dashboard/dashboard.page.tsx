@@ -1,10 +1,10 @@
 import type { DashboardStatus } from './dashboard-status'
 import { DashboardCharts } from './components/dashboard-charts'
 import { DashboardEmptyState } from './components/dashboard-empty-state'
-import { DashboardError } from './components/dashboard-error'
 import { DashboardLoading } from './components/dashboard-loading'
 import { DashboardMetrics } from './components/dashboard-metrics'
 import { dashboardData, type DashboardData } from './dashboard-data'
+import { RetryCard } from '@components/retry-card'
 
 export type { DashboardStatus } from './dashboard-status'
 
@@ -16,7 +16,15 @@ type DashboardPageProps = {
 
 export function DashboardPage({ data = dashboardData, status = 'success', onRetry }: DashboardPageProps) {
   if (status === 'loading') return <DashboardLoading />
-  if (status === 'error') return <DashboardError onRetry={onRetry} />
+  if (status === 'error') {
+    return (
+      <RetryCard
+        title="Não foi possível carregar o dashboard."
+        description="Verifique sua conexão e tente novamente."
+        onRetry={onRetry ?? (() => undefined)}
+      />
+    )
+  }
 
   return (
     <div className="space-y-6">

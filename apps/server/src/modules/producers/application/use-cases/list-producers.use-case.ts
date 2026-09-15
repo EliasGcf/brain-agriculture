@@ -1,5 +1,5 @@
 import { PaginatedResult } from '@core/dto/paginated-result';
-import { Producer } from '@modules/producers/domain/entities/producer';
+import { ListProducersDto } from '@modules/producers/application/dto/list-producers.dto';
 import { ProducersRepository } from '@modules/producers/domain/repositories/producers.repository';
 import { Injectable } from '@nestjs/common';
 
@@ -12,10 +12,10 @@ export interface Params {
 
 @Injectable()
 export class ListProducersUseCase {
-  constructor(private readonly repository: ProducersRepository) {}
+  constructor(private readonly producersRepository: ProducersRepository) {}
 
-  async execute(params: Params): Promise<PaginatedResult<Producer>> {
-    const result = await this.repository.findMany(params);
+  async execute(params: Params): Promise<PaginatedResult<ListProducersDto>> {
+    const result = await this.producersRepository.findMany(params);
     return result;
   }
 }

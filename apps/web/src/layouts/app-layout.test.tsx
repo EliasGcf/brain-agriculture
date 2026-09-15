@@ -1,10 +1,11 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 
 import { AppRoutes } from '../routes'
+import { renderWithProviders } from '../../tests/test-utils'
 
 function renderAt(path: string) {
   window.history.pushState({}, '', path)
-  return render(<AppRoutes />)
+  return renderWithProviders(<AppRoutes />)
 }
 
 afterEach(() => {
@@ -44,7 +45,7 @@ describe('application layout', () => {
 
   it('should be able to return to the previous page with the back button', async () => {
     window.history.pushState({}, '', '/')
-    renderAt('/produtores')
+    renderAt('/producers')
 
     fireEvent.click(screen.getByRole('button', { name: 'Voltar' }))
 

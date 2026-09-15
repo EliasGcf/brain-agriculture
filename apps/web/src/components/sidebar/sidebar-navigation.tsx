@@ -13,7 +13,7 @@ import {
 
 const navigationItems = [
   { label: 'Dashboard', to: '/', icon: LayoutDashboard },
-  { label: 'Produtores', to: '/produtores', icon: Building2 },
+  { label: 'Produtores', to: '/producers', icon: Building2 },
   { label: 'Fazendas', to: '/farms', icon: BarChart3 },
 ]
 

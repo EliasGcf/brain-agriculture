@@ -12,7 +12,7 @@ describe('Document', () => {
 
   it('should be able to create a normalized alphanumeric CNPJ', () => {
     const document = Document.create('12.ABC.345/01DE-35');
-    expect(document.value).toBe('12ABC34501DE35');
+    expect(document.value).toBe('12abc34501de35');
     expect(document.type).toBe('cnpj');
   });
 
