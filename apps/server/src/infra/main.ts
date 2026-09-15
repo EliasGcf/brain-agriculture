@@ -1,12 +1,15 @@
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { StandardSchemaValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { NativeLogger } from 'nestjs-pino';
 
 import { AppModule } from './app.module';
 import { EnvService } from '@infra/env/env.service';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { bufferLogs: true });
+
+  app.useLogger(app.get(NativeLogger));
 
   app.enableShutdownHooks();
   app.useGlobalPipes(new StandardSchemaValidationPipe());
