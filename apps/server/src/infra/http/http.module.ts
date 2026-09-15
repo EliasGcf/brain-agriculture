@@ -35,6 +35,14 @@ import { UpdateProducerController } from './controllers/update-producer.controll
 import { GetProducerByIdUseCase } from '@modules/producers/application/use-cases/get-producer-by-id.use-case';
 import { ListProducersUseCase } from '@modules/producers/application/use-cases/list-producers.use-case';
 import { UpdateProducerUseCase } from '@modules/producers/application/use-cases/update-producer.use-case';
+import { DeleteProducerController } from './controllers/delete-producer.controller';
+import { ListFarmsByProducerController } from './controllers/list-farms-by-producer.controller';
+import { ListHarvestsByFarmController } from './controllers/list-harvests-by-farm.controller';
+import { ListPlantedCropsByHarvestController } from './controllers/list-planted-crops-by-harvest.controller';
+import { DeleteProducerUseCase } from '@modules/producers/application/use-cases/delete-producer.use-case';
+import { ListFarmsByProducerUseCase } from '@modules/farms/application/use-cases/list-farms-by-producer.use-case';
+import { ListHarvestsByFarmUseCase } from '@modules/farms/application/use-cases/list-harvests-by-farm.use-case';
+import { ListPlantedCropsByHarvestUseCase } from '@modules/farms/application/use-cases/list-planted-crops-by-harvest.use-case';
 
 @Module({
   imports: [DatabaseModule],
@@ -43,6 +51,10 @@ import { UpdateProducerUseCase } from '@modules/producers/application/use-cases/
     ListProducersController,
     GetProducerByIdController,
     UpdateProducerController,
+    DeleteProducerController,
+    ListFarmsByProducerController,
+    ListHarvestsByFarmController,
+    ListPlantedCropsByHarvestController,
     CreateFarmController,
     GetFarmByIdController,
     UpdateFarmController,
@@ -74,6 +86,10 @@ import { UpdateProducerUseCase } from '@modules/producers/application/use-cases/
     GetProducerByIdUseCase,
     ListProducersUseCase,
     UpdateProducerUseCase,
+    DeleteProducerUseCase,
+    ListFarmsByProducerUseCase,
+    ListHarvestsByFarmUseCase,
+    ListPlantedCropsByHarvestUseCase,
   ],
 })
 export class HttpModule {}

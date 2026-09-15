@@ -1,3 +1,6 @@
+import { InMemoryFarmsRepository } from '@test/repositories/in-memory-farms.repository';
+import { InMemoryHarvestsRepository } from '@test/repositories/in-memory-harvests.repository';
+import { InMemoryPlantedCropsRepository } from '@test/repositories/in-memory-planted-crops.repository';
 import { InMemoryProducersRepository } from '@test/repositories/in-memory-producers.repository';
 import { makeProducer } from '@test/factories/make-producer.factory';
 import { ListProducersUseCase } from './list-producers.use-case';
@@ -7,7 +10,10 @@ describe('ListProducersUseCase', () => {
   let useCase: ListProducersUseCase;
 
   beforeEach(() => {
-    repository = new InMemoryProducersRepository();
+    const plantedCropsRepository = new InMemoryPlantedCropsRepository();
+    const harvestsRepository = new InMemoryHarvestsRepository(plantedCropsRepository);
+    const farmsRepository = new InMemoryFarmsRepository(harvestsRepository);
+    repository = new InMemoryProducersRepository(farmsRepository);
     useCase = new ListProducersUseCase(repository);
   });
 
@@ -31,7 +37,7 @@ describe('ListProducersUseCase', () => {
 
     const nameResult = await useCase.execute({ name: 'sil', page: 1, perPage: 10 });
     expect(nameResult.items).toHaveLength(1);
-    expect(nameResult.items[0]).toBe(oldest);
+    expect(nameResult.items[0].producer).toBe(oldest);
     expect(nameResult.total).toBe(1);
 
     const documentResult = await useCase.execute({
@@ -40,16 +46,16 @@ describe('ListProducersUseCase', () => {
       perPage: 10,
     });
     expect(documentResult.items).toHaveLength(1);
-    expect(documentResult.items[0]).toBe(middle);
+    expect(documentResult.items[0].producer).toBe(middle);
     expect(documentResult.total).toBe(1);
 
     const paginatedResult = await useCase.execute({ page: 1, perPage: 2 });
-    expect(paginatedResult.items).toEqual([newest, middle]);
-    expect(paginatedResult.items).not.toContain(oldest);
+    expect(paginatedResult.items.map((item) => item.producer)).toEqual([newest, middle]);
+    expect(paginatedResult.items.map((item) => item.producer)).not.toContain(oldest);
     expect(paginatedResult.total).toBe(3);
 
     const nextPageResult = await useCase.execute({ page: 2, perPage: 2 });
-    expect(nextPageResult.items).toEqual([oldest]);
+    expect(nextPageResult.items.map((item) => item.producer)).toEqual([oldest]);
     expect(nextPageResult.total).toBe(3);
   });
 });

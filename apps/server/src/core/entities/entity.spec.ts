@@ -33,4 +33,12 @@ describe('entity', () => {
 
     expect(entity.id).toBe(id);
   });
+
+  it('should consider entities with different ID instances and the same value equal', () => {
+    const first = new TestEntity({ name: 'John' }, new UniqueEntityID('entity-id'));
+    const second = new TestEntity({ name: 'John' }, new UniqueEntityID('entity-id'));
+
+    expect(first.equals(second)).toBe(true);
+    expect(second.equals(first)).toBe(true);
+  });
 });

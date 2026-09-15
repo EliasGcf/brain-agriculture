@@ -23,6 +23,15 @@ export class DrizzleFarmsRepository implements FarmsRepository {
     return DrizzleFarmMapper.toDomain(farm);
   }
 
+  async findManyByProducerId(producerId: string): Promise<Farm[]> {
+    const farms = await this.db
+      .select()
+      .from(schema.farms)
+      .where(eq(schema.farms.producerId, producerId));
+
+    return farms.map(DrizzleFarmMapper.toDomain);
+  }
+
   async save(farm: Farm): Promise<Farm> {
     const raw = DrizzleFarmMapper.toRaw(farm);
 

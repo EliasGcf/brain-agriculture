@@ -54,6 +54,17 @@ describe('DrizzleFarmsRepository', () => {
     expect(updated?.createdAt).toEqual(createdAt);
   });
 
+  it('should be able to find persisted farms by producer id', async () => {
+    const producer = await producersRepository.save(makeProducer());
+    const farm = await farmsRepository.save(
+      makeFarm({ producerId: producer.id.toString() }),
+    );
+
+    await expect(
+      farmsRepository.findManyByProducerId(producer.id.toString()),
+    ).resolves.toEqual([farm]);
+  });
+
   it('should be able to delete a persisted farm', async () => {
     const producer = await producersRepository.save(makeProducer());
     const farm = await farmsRepository.save(

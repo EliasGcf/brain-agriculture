@@ -1,4 +1,7 @@
 import { ResourceNotFoundError } from '@core/errors/common/resource-not-found.error';
+import { InMemoryFarmsRepository } from '@test/repositories/in-memory-farms.repository';
+import { InMemoryHarvestsRepository } from '@test/repositories/in-memory-harvests.repository';
+import { InMemoryPlantedCropsRepository } from '@test/repositories/in-memory-planted-crops.repository';
 import { UpdateProducerUseCase } from './update-producer.use-case';
 import { InMemoryProducersRepository } from '@test/repositories/in-memory-producers.repository';
 import { makeProducer } from '@test/factories/make-producer.factory';
@@ -10,7 +13,10 @@ describe('UpdateProducerUseCase', () => {
   let useCase: UpdateProducerUseCase;
 
   beforeEach(() => {
-    repository = new InMemoryProducersRepository();
+    const plantedCropsRepository = new InMemoryPlantedCropsRepository();
+    const harvestsRepository = new InMemoryHarvestsRepository(plantedCropsRepository);
+    const farmsRepository = new InMemoryFarmsRepository(harvestsRepository);
+    repository = new InMemoryProducersRepository(farmsRepository);
     useCase = new UpdateProducerUseCase(repository);
   });
 

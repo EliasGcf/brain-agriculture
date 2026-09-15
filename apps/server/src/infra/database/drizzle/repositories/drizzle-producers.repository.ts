@@ -1,11 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { and, asc, count, desc, eq, ilike } from 'drizzle-orm';
-
-import { PaginatedResult } from '@core/dto/paginated-result';
+import { and, asc, count, desc, eq, getTableColumns, ilike } from 'drizzle-orm';
 
 import { Producer } from '@modules/producers/domain/entities/producer';
 import {
   FindManyProducersParams,
+  FindManyProducersResult,
   ProducersRepository,
 } from '@modules/producers/domain/repositories/producers.repository';
 
@@ -42,7 +41,7 @@ export class DrizzleProducersRepository implements ProducersRepository {
     return DrizzleProducerMapper.toDomain(producer);
   }
 
-  async findMany(params: FindManyProducersParams): Promise<PaginatedResult<Producer>> {
+  async findMany(params: FindManyProducersParams): Promise<FindManyProducersResult> {
     const conditions = [];
 
     if (params.name) {
@@ -58,9 +57,14 @@ export class DrizzleProducersRepository implements ProducersRepository {
 
     const [rows, [{ total }]] = await Promise.all([
       this.db
-        .select()
+        .select({
+          ...getTableColumns(schema.producers),
+          farmsCount: count(schema.farms.id),
+        })
         .from(schema.producers)
+        .leftJoin(schema.farms, eq(schema.farms.producerId, schema.producers.id))
         .where(where)
+        .groupBy(schema.producers.id)
         .orderBy(desc(schema.producers.createdAt), asc(schema.producers.id))
         .limit(params.perPage)
         .offset(offset),
@@ -68,7 +72,10 @@ export class DrizzleProducersRepository implements ProducersRepository {
     ]);
 
     return {
-      items: rows.map(DrizzleProducerMapper.toDomain),
+      items: rows.map(({ farmsCount, ...raw }) => ({
+        producer: DrizzleProducerMapper.toDomain(raw),
+        farmsCount,
+      })),
       total,
     };
   }

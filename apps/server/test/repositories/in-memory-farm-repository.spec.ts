@@ -22,6 +22,15 @@ describe('InMemoryFarmsRepository', () => {
     await expect(farmsRepository.findById(farm.id.toString())).resolves.toBe(farm);
   });
 
+  it('should be able to find farms by producer id', async () => {
+    const farm = await farmsRepository.save(makeFarm({ producerId: 'producer-1' }));
+    await farmsRepository.save(makeFarm({ producerId: 'producer-2' }));
+
+    await expect(farmsRepository.findManyByProducerId('producer-1')).resolves.toEqual([
+      farm,
+    ]);
+  });
+
   it('should be able to replace a farm when saving an existing id', async () => {
     const farm = await farmsRepository.save(makeFarm());
     const replacement = Farm.create(

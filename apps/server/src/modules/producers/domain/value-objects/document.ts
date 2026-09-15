@@ -8,7 +8,7 @@ const { cpf, cnpj } = zodValidator(z);
 
 const schema = z
   .string()
-  .transform((value) => cnpjTools.strip(value))
+  .transform((value) => cnpjTools.strip(value).toLowerCase())
   .pipe(z.union([cpf(), cnpj()]));
 
 type Schema = typeof schema;
@@ -22,11 +22,21 @@ export class Document extends ValueObject<Schema> {
     }
   }
 
+  static strip(text: string) {
+    return cnpjTools.strip(text);
+  }
+
   get value() {
     return this.props;
   }
 
   get type(): 'cpf' | 'cnpj' {
-    return cpfTools.isValid(this.props) ? 'cpf' : 'cnpj';
+    const length = this.props.length;
+    return length === 11 ? 'cpf' : 'cnpj';
+  }
+
+  get formatted(): string {
+    if (this.type === 'cpf') return cpfTools.format(this.props);
+    return cnpjTools.format(this.props);
   }
 }
