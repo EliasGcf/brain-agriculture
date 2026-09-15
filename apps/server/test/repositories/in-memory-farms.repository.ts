@@ -11,6 +11,10 @@ export class InMemoryFarmsRepository implements FarmsRepository {
     return this.items.find((item) => item.id.toString() === id) ?? null;
   }
 
+  async findManyByProducerId(producerId: string) {
+    return this.items.filter((item) => item.producerId === producerId);
+  }
+
   async save(farm: Farm) {
     const index = this.items.findIndex((item) => item.id.equals(farm.id));
     if (index === -1) this.items.push(farm);

@@ -87,7 +87,10 @@ describe('DrizzleProducersRepository', () => {
     });
 
     expect(firstPage).toEqual({
-      items: [newestProducer, matchingProducer],
+      items: [
+        { producer: newestProducer, farmsCount: 0 },
+        { producer: matchingProducer, farmsCount: 0 },
+      ],
       total: 3,
     });
 
@@ -98,7 +101,10 @@ describe('DrizzleProducersRepository', () => {
       perPage: 10,
     });
 
-    expect(filteredPage).toEqual({ items: [matchingProducer], total: 1 });
+    expect(filteredPage).toEqual({
+      items: [{ producer: matchingProducer, farmsCount: 0 }],
+      total: 1,
+    });
 
     const emptyPage = await producersRepository.findMany({
       name: 'does not exist',
@@ -107,6 +113,6 @@ describe('DrizzleProducersRepository', () => {
     });
 
     expect(emptyPage).toEqual({ items: [], total: 0 });
-    expect(firstPage.items).not.toContain(olderProducer);
+    expect(firstPage.items.map((item) => item.producer)).not.toContain(olderProducer);
   });
 });

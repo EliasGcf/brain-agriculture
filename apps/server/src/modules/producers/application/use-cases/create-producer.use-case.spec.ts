@@ -1,4 +1,7 @@
 import { InMemoryProducersRepository } from '@test/repositories/in-memory-producers.repository';
+import { InMemoryFarmsRepository } from '@test/repositories/in-memory-farms.repository';
+import { InMemoryHarvestsRepository } from '@test/repositories/in-memory-harvests.repository';
+import { InMemoryPlantedCropsRepository } from '@test/repositories/in-memory-planted-crops.repository';
 import { DocumentAlreadyUsedError } from '../errors/document-already-used-error';
 import { CreateProducerUseCase } from './create-producer.use-case';
 import { makeProducer } from '@test/factories/make-producer.factory';
@@ -10,7 +13,10 @@ describe('CreateProducerUseCase', () => {
   let useCase: CreateProducerUseCase;
 
   beforeEach(() => {
-    repository = new InMemoryProducersRepository();
+    const plantedCropsRepository = new InMemoryPlantedCropsRepository();
+    const harvestsRepository = new InMemoryHarvestsRepository(plantedCropsRepository);
+    const farmsRepository = new InMemoryFarmsRepository(harvestsRepository);
+    repository = new InMemoryProducersRepository(farmsRepository);
     useCase = new CreateProducerUseCase(repository);
   });
 

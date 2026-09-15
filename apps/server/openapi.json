@@ -179,6 +179,140 @@
         "tags": [
           "Producers"
         ]
+      },
+      "delete": {
+        "operationId": "DeleteProducer",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "403": {
+            "description": "Producer has farms"
+          },
+          "404": {
+            "description": "Producer not found"
+          }
+        },
+        "tags": [
+          "Producers"
+        ]
+      }
+    },
+    "/producers/{producerId}/farms": {
+      "get": {
+        "operationId": "ListFarmsByProducer",
+        "parameters": [
+          {
+            "name": "producerId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FarmResponse"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Farms"
+        ]
+      }
+    },
+    "/farms/{farmId}/harvests": {
+      "get": {
+        "operationId": "ListHarvestsByFarm",
+        "parameters": [
+          {
+            "name": "farmId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/HarvestResponse"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Harvests"
+        ]
+      }
+    },
+    "/harvests/{harvestId}/planted-crops": {
+      "get": {
+        "operationId": "ListPlantedCropsByHarvest",
+        "parameters": [
+          {
+            "name": "harvestId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PlantedCropResponse"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Planted Crops"
+        ]
       }
     },
     "/farms": {
@@ -713,13 +847,17 @@
                 },
                 "createdAt": {
                   "type": "string"
+                },
+                "farmsCount": {
+                  "type": "number"
                 }
               },
               "required": [
                 "id",
                 "name",
                 "document",
-                "createdAt"
+                "createdAt",
+                "farmsCount"
               ]
             }
           },

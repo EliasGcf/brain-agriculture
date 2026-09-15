@@ -15,10 +15,10 @@ describe('UpdateFarmUseCase', () => {
   let useCase: UpdateFarmUseCase;
 
   beforeEach(() => {
-    producersRepository = new InMemoryProducersRepository();
     farmsRepository = new InMemoryFarmsRepository(
       new InMemoryHarvestsRepository(new InMemoryPlantedCropsRepository()),
     );
+    producersRepository = new InMemoryProducersRepository(farmsRepository);
     useCase = new UpdateFarmUseCase(farmsRepository, producersRepository);
   });
 
