@@ -815,7 +815,28 @@
             "type": "string"
           },
           "document": {
-            "type": "string"
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "cpf",
+                  "cnpj"
+                ]
+              },
+              "value": {
+                "type": "string"
+              },
+              "formatted": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "type",
+              "value",
+              "formatted"
+            ],
+            "x-nestjs_zod-self-required": true
           },
           "createdAt": {
             "type": "string"
@@ -843,7 +864,27 @@
                   "type": "string"
                 },
                 "document": {
-                  "type": "string"
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "cpf",
+                        "cnpj"
+                      ]
+                    },
+                    "value": {
+                      "type": "string"
+                    },
+                    "formatted": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "value",
+                    "formatted"
+                  ]
                 },
                 "createdAt": {
                   "type": "string"

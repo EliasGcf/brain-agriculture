@@ -7,7 +7,11 @@ import z from 'zod';
 const schema = z.object({
   id: z.string(),
   name: z.string(),
-  document: z.string(),
+  document: z.object({
+    type: z.enum(['cpf', 'cnpj']),
+    value: z.string(),
+    formatted: z.string(),
+  }),
   createdAt: z.string(),
 });
 
@@ -27,7 +31,11 @@ export class ProducerPresenter {
     return schema.parse({
       id: producer.id.toString(),
       name: producer.name,
-      document: producer.document.value,
+      document: {
+        type: producer.document.type,
+        value: producer.document.value,
+        formatted: producer.document.formatted,
+      },
       createdAt: producer.createdAt.toISOString(),
     });
   }
@@ -38,7 +46,11 @@ export class ProducerPresenter {
       items: producers.items.map(({ producer, farmsCount }) => ({
         id: producer.id.toString(),
         name: producer.name,
-        document: producer.document.value,
+        document: {
+          type: producer.document.type,
+          value: producer.document.value,
+          formatted: producer.document.formatted,
+        },
         createdAt: producer.createdAt.toISOString(),
         farmsCount,
       })),

@@ -36,7 +36,7 @@ describe('CreateProducerUseCase', () => {
     const document = cnpj.generate();
     const producer = await useCase.execute({ name: 'Empresa Rural', document });
 
-    expect(producer.document.value).toBe(document);
+    expect(producer.document.value).toBe(document.toLowerCase());
     await expect(repository.findById(producer.id.toString())).resolves.toEqual(producer);
   });
 
