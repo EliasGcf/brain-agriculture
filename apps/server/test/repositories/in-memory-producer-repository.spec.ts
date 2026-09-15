@@ -16,6 +16,13 @@ describe('InMemoryProducersRepository', () => {
     repository = new InMemoryProducersRepository(farmsRepository);
   });
 
+  it('should be able to count producers', async () => {
+    await repository.save(makeProducer());
+    await repository.save(makeProducer());
+
+    await expect(repository.count()).resolves.toBe(2);
+  });
+
   it('should be able to save and find a producer by id', async () => {
     const producer = await repository.save(makeProducer());
     await expect(repository.findById(producer.id.toString())).resolves.toBe(producer);
