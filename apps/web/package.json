@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "generate:api": "rtk-query-codegen-openapi openapi-config.cjs",
+    "msw:init": "msw init public --save",
     "lint": "oxlint",
     "preview": "vite preview",
     "test": "vitest run",
@@ -44,9 +45,15 @@
     "@vitejs/plugin-react": "^6.1.1",
     "babel-plugin-react-compiler": "^1.0.0",
     "jsdom": "^30.0.1",
+    "msw": "^2.11.3",
     "oxlint": "^1.81.0",
     "typescript": "~6.0.2",
     "vite": "^8.3.0",
     "vitest": "^5.0.0"
+  },
+  "msw": {
+    "workerDirectory": [
+      "public"
+    ]
   }
 }
