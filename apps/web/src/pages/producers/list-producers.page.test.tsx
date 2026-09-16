@@ -41,7 +41,7 @@ describe('producers page', () => {
   it('should be able to search producers by partial name', async () => {
     renderProducers()
 
-    const search = screen.getByRole('textbox', { name: 'Nome do produtor' })
+    const search = screen.getByRole('textbox', { name: 'Nome ou CPF/CNPJ' })
     await screen.findByText('Ada Rural')
     fireEvent.change(search, { target: { value: 'bruno' } })
     fireEvent.submit(screen.getByRole('form', { name: 'Buscar produtores' }))
@@ -53,7 +53,7 @@ describe('producers page', () => {
   it('should be able to search producers by document', async () => {
     renderProducers()
 
-    const search = screen.getByRole('textbox', { name: 'CPF ou CNPJ' })
+    const search = screen.getByRole('textbox', { name: 'Nome ou CPF/CNPJ' })
     await screen.findByText('Ada Rural')
     fireEvent.change(search, { target: { value: '390.533.447-05' } })
     fireEvent.submit(screen.getByRole('form', { name: 'Buscar produtores' }))
@@ -62,10 +62,34 @@ describe('producers page', () => {
     await waitFor(() => expect(screen.queryByText('Ada Rural')).not.toBeInTheDocument())
   })
 
+  it('should not match a document when its letters differ', async () => {
+    mockData.producers.push(
+      makeProducer({
+        id: '00000000-0000-4000-8000-000000000007',
+        name: 'Mixed Document Rural',
+        document: {
+          type: 'cnpj',
+          value: 'AB123',
+          formatted: 'AB.123',
+        },
+      }),
+    )
+
+    renderProducers()
+
+    const search = screen.getByRole('textbox', { name: 'Nome ou CPF/CNPJ' })
+    await screen.findByText('Ada Rural')
+    fireEvent.change(search, { target: { value: 'AC.123' } })
+    fireEvent.submit(screen.getByRole('form', { name: 'Buscar produtores' }))
+
+    expect(await screen.findByText('Nenhum produtor encontrado')).toBeInTheDocument()
+    expect(screen.queryByText('Mixed Document Rural')).not.toBeInTheDocument()
+  })
+
   it('should be able to show an empty state for an empty API response', async () => {
     renderProducers()
 
-    const search = screen.getByRole('textbox', { name: 'Nome do produtor' })
+    const search = screen.getByRole('textbox', { name: 'Nome ou CPF/CNPJ' })
     await screen.findByText('Ada Rural')
     fireEvent.change(search, { target: { value: 'does not exist' } })
     fireEvent.submit(screen.getByRole('form', { name: 'Buscar produtores' }))
@@ -104,7 +128,7 @@ describe('producers page', () => {
         const url = new URL(request.url)
         const page = Number(url.searchParams.get('page') ?? 1)
         const perPage = Number(url.searchParams.get('perPage') ?? PAGE_SIZE)
-        const query = url.searchParams.get('name')
+        const query = url.searchParams.get('search')
         const filtered = query ? records.filter((record) => record.name.includes(query)) : records
         const start = (page - 1) * perPage
         return HttpResponse.json({
@@ -115,17 +139,15 @@ describe('producers page', () => {
     )
 
     renderProducers()
-    const nameSearch = screen.getByRole('textbox', { name: 'Nome do produtor' })
-    const documentSearch = screen.getByRole('textbox', { name: 'CPF ou CNPJ' })
-    fireEvent.change(nameSearch, { target: { value: 'URL' } })
-    fireEvent.change(documentSearch, { target: { value: '529.982.247-25' } })
+    const search = screen.getByRole('textbox', { name: 'Nome ou CPF/CNPJ' })
+    fireEvent.change(search, { target: { value: 'URL' } })
     fireEvent.submit(screen.getByRole('form', { name: 'Buscar produtores' }))
 
-    await waitFor(() => expect(window.location.search).toBe('?name=URL&document=529.982.247-25'))
+    await waitFor(() => expect(window.location.search).toBe('?search=URL'))
     expect(await screen.findByText('URL 1 Rural')).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Próxima página' }))
 
-    await waitFor(() => expect(window.location.search).toBe('?name=URL&document=529.982.247-25&page=2'))
+    await waitFor(() => expect(window.location.search).toBe('?search=URL&page=2'))
     expect(await screen.findByText(`URL ${PAGE_SIZE + 1} Rural`)).toBeInTheDocument()
   })
 

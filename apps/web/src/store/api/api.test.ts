@@ -1,8 +1,8 @@
 import { http, HttpResponse } from 'msw';
 
 import { api } from './api.generated';
-import { server } from '../../tests/mocks/server';
-import { apiStore } from './store';
+import { server } from '../../../tests/mocks/server';
+import { apiStore } from '../store';
 
 describe('MSW API integration', () => {
   it('should be able to fetch producers through an RTK Query endpoint', async () => {
@@ -38,6 +38,26 @@ describe('MSW API integration', () => {
       'Bruno Rural',
     ]);
     expect(secondPage.items.map((item) => item.name)).toEqual(['Cora Rural']);
+  });
+
+  it('should be able to search producers by name through the unified query', async () => {
+    const result = await apiStore.dispatch(
+      api.endpoints.listProducers.initiate({ search: 'bruno', page: 1, perPage: 10 }),
+    ).unwrap();
+
+    expect(result.items.map((item) => item.name)).toEqual(['Bruno Rural']);
+  });
+
+  it('should be able to search producers by formatted document through the unified query', async () => {
+    const result = await apiStore.dispatch(
+      api.endpoints.listProducers.initiate({
+        search: '390.533.447-05',
+        page: 1,
+        perPage: 10,
+      }),
+    ).unwrap();
+
+    expect(result.items.map((item) => item.name)).toEqual(['Bruno Rural']);
   });
 
   it('should be able to list farms by producer through an RTK Query endpoint', async () => {
@@ -219,7 +239,7 @@ describe('MSW API integration', () => {
 
   it('should not be able to use stale mock overrides after each test', async () => {
     const result = await apiStore.dispatch(
-      api.endpoints.listProducers.initiate({ name: 'New Producer' }),
+      api.endpoints.listProducers.initiate({ search: 'New Producer' }),
     ).unwrap();
 
     expect(result.items).toHaveLength(0);

@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router';
 import { toast } from 'sonner';
 
-import { useCreateProducerMutation } from '@store/api.generated';
+import { useCreateProducerMutation } from '@store/api/api.generated';
 
 import { ProducerForm } from './components/producer-form';
 

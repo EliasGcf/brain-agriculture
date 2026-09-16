@@ -17,7 +17,7 @@ describe('ListProducersUseCase', () => {
     useCase = new ListProducersUseCase(repository);
   });
 
-  it('should be able to list producers with filters and pagination', async () => {
+  it('should be able to list producers with unified search and pagination', async () => {
     const oldest = makeProducer({
       name: 'Maria Silva',
       document: '52998224725',
@@ -35,13 +35,13 @@ describe('ListProducersUseCase', () => {
     });
     repository.items = [oldest, middle, newest];
 
-    const nameResult = await useCase.execute({ name: 'sil', page: 1, perPage: 10 });
+    const nameResult = await useCase.execute({ search: 'sil', page: 1, perPage: 10 });
     expect(nameResult.items).toHaveLength(1);
     expect(nameResult.items[0].producer).toBe(oldest);
     expect(nameResult.total).toBe(1);
 
     const documentResult = await useCase.execute({
-      document: '444777',
+      search: '444777',
       page: 1,
       perPage: 10,
     });

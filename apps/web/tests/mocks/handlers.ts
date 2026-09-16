@@ -8,7 +8,7 @@ import type {
   UpdateHarvestApiArg,
   UpdatePlantedCropApiArg,
   UpdateProducerApiArg,
-} from '../../src/store/api.generated';
+} from '../../src/store/api/api.generated';
 
 import {
   makeFarm,
@@ -22,6 +22,8 @@ import {
 
 const baseUrl = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/+$/, '');
 const route = (path: string) => `${baseUrl}${path}`;
+const brasilApiBaseUrl = (import.meta.env.VITE_BRASIL_API_BASE_URL || 'https://brasilapi.com.br/api').replace(/\/+$/, '');
+const brasilRoute = (path: string) => `${brasilApiBaseUrl}${path}`;
 
 const notFound = () => HttpResponse.json({ message: 'Not found' }, { status: 404 });
 const parseBody = async <T>(request: Request): Promise<T> => (await request.json()) as T;
@@ -35,15 +37,19 @@ const parseBody = async <T>(request: Request): Promise<T> => (await request.json
  * I don't see the point in adding another codegen tool, especially since Orval does not support RTK Query.
  */
 export const handlers = [
+  http.get(brasilRoute('/ibge/municipios/v1/:uf'), () =>
+    HttpResponse.json([{ nome: 'Salvador', codigo_ibge: '2927408' }]),
+  ),
   http.get(route('/producers'), ({ request }) => {
     const url = new URL(request.url);
-    const name = url.searchParams.get('name')?.toLowerCase();
-    const document = url.searchParams.get('document');
+    const search = url.searchParams.get('search')?.trim();
+    const normalizedSearch = search?.replace(/[^\p{L}\p{N}]/gu, '');
     const page = Number(url.searchParams.get('page') ?? 1);
     const perPage = Number(url.searchParams.get('perPage') ?? 10);
     const filtered = mockData.producers.filter((item) =>
-      (!name || item.name.toLowerCase().includes(name)) &&
-      (!document || item.document.value.includes(document)),
+      !search ||
+      item.name.toLowerCase().includes(search.toLowerCase()) ||
+      Boolean(normalizedSearch) && item.document.value.includes(normalizedSearch!),
     );
     const start = Math.max(0, page - 1) * perPage;
     const items = filtered.slice(start, start + perPage).map((producer) => ({
@@ -94,6 +100,27 @@ export const handlers = [
   http.get(route('/producers/:producerId/farms'), ({ params }) => {
     const records = mockData.farms.filter((farm) => farm.producerId === params.producerId);
     return HttpResponse.json(records);
+  }),
+
+  http.get(route('/farms'), ({ request }) => {
+    const url = new URL(request.url);
+    const name = url.searchParams.get('name')?.toLowerCase();
+    const city = url.searchParams.get('city')?.toLowerCase();
+    const state = url.searchParams.get('state')?.toLowerCase();
+    const producerId = url.searchParams.get('producerId');
+    const page = Number(url.searchParams.get('page') ?? 1);
+    const perPage = Number(url.searchParams.get('perPage') ?? 10);
+    const filtered = mockData.farms.filter((farm) =>
+      (!name || farm.name.toLowerCase().includes(name)) &&
+      (!city || farm.city.toLowerCase().includes(city)) &&
+      (!state || farm.state.toLowerCase().includes(state)) &&
+      (!producerId || farm.producerId === producerId),
+    );
+    const start = Math.max(0, page - 1) * perPage;
+    return HttpResponse.json({
+      items: filtered.slice(start, start + perPage),
+      total: filtered.length,
+    });
   }),
 
   http.post(route('/farms'), async ({ request }) => {

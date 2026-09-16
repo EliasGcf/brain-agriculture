@@ -7,7 +7,7 @@ import { Field, FieldError, FieldGroup, FieldLabel } from '@components/ui/field'
 import { Input } from '@components/ui/input';
 
 import { formatDocument, isValidDocument } from '@utils/document';
-import type { CreateProducerApiArg, ProducerResponse } from '@store/api.generated';
+import type { CreateProducerApiArg, ProducerResponse } from '@store/api/api.generated';
 import { Spinner } from '@components/ui/spinner';
 import { SaveIcon } from 'lucide-react';
 

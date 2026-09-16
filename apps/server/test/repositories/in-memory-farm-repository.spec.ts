@@ -5,16 +5,20 @@ import { makeHarvest } from '../factories/make-harvest.factory';
 import { InMemoryFarmsRepository } from './in-memory-farms.repository';
 import { InMemoryHarvestsRepository } from './in-memory-harvests.repository';
 import { InMemoryPlantedCropsRepository } from './in-memory-planted-crops.repository';
+import { InMemoryProducersRepository } from './in-memory-producers.repository';
+import { makeProducer } from '../factories/make-producer.factory';
 
 describe('InMemoryFarmsRepository', () => {
   let plantedCropsRepository: InMemoryPlantedCropsRepository;
   let harvestsRepository: InMemoryHarvestsRepository;
   let farmsRepository: InMemoryFarmsRepository;
+  let producersRepository: InMemoryProducersRepository;
 
   beforeEach(() => {
     plantedCropsRepository = new InMemoryPlantedCropsRepository();
     harvestsRepository = new InMemoryHarvestsRepository(plantedCropsRepository);
     farmsRepository = new InMemoryFarmsRepository(harvestsRepository);
+    producersRepository = new InMemoryProducersRepository(farmsRepository);
   });
 
   it('should be able to save and find a farm by id', async () => {
@@ -29,6 +33,32 @@ describe('InMemoryFarmsRepository', () => {
     await expect(farmsRepository.findManyByProducerId('producer-1')).resolves.toEqual([
       farm,
     ]);
+  });
+
+  it('should be able to find farms with partial filters and pagination', async () => {
+    const producer = await producersRepository.save(makeProducer());
+    const matchingFarm = makeFarm({
+      name: 'Green Valley',
+      producerId: producer.id.toString(),
+      city: 'Sao Paulo',
+      state: 'SP',
+    });
+    farmsRepository.items = [
+      matchingFarm,
+      makeFarm({ name: 'Green Valley North', producerId: producer.id.toString(), city: 'Campinas', state: 'SP' }),
+      makeFarm({ name: 'Other Farm', producerId: 'producer-2', city: 'Sao Paulo', state: 'SP' }),
+    ];
+
+    await expect(
+      farmsRepository.findMany({
+        name: 'green',
+        producerId: producer.id.toString(),
+        city: 'sao',
+        state: 'sp',
+        page: 1,
+        perPage: 10,
+      }),
+    ).resolves.toEqual({ items: [{ farm: matchingFarm, owner: producer }], total: 1 });
   });
 
   it('should be able to replace a farm when saving an existing id', async () => {

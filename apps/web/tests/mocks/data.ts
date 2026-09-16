@@ -3,7 +3,7 @@ import type {
   HarvestResponse,
   PlantedCropResponse,
   ProducerResponse,
-} from '../../src/store/api.generated';
+} from '../../src/store/api/api.generated';
 import { cnpj, cpf } from 'cpf-cnpj-validator';
 
 export const makeDocumentResponse = (value: string): ProducerResponse['document'] => {

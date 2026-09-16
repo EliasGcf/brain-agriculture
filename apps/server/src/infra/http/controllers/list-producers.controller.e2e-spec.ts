@@ -36,11 +36,11 @@ describe('ListProducersController (e2e)', () => {
 
     const response = await request(app.getHttpServer())
       .get('/producers')
-      .query({ name: producer.name })
+      .query({ search: producer.name })
       .expect(200);
 
     const persistedProducers = await producersRepository.findMany({
-      name: producer.name,
+      search: producer.name,
       page: 1,
       perPage: 10,
     });
@@ -55,7 +55,7 @@ describe('ListProducersController (e2e)', () => {
 
     const response = await request(app.getHttpServer())
       .get('/producers')
-      .query({ name: producer.name });
+      .query({ search: producer.name });
 
     expect(response.body.items).toEqual([
       expect.objectContaining({

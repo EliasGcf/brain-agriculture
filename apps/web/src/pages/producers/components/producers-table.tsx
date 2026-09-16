@@ -23,7 +23,7 @@ import {
   TableHeader,
   TableRow,
 } from '@components/ui/table'
-import type { PaginatedProducerResponse } from '@store/api.generated'
+import type { PaginatedProducerResponse } from '@store/api/api.generated'
 
 
 type Producer = PaginatedProducerResponse['items'][number]
@@ -55,7 +55,7 @@ export function ProducersTable({
 
   return (
     <>
-      <div className={isFetching ? 'space-y-4 opacity-60' : 'space-y-4'} aria-busy={isFetching}>
+      <div className={isFetching ? 'flex flex-col gap-4 opacity-60' : 'flex flex-col gap-4'} aria-busy={isFetching}>
       {producers.length === 0 ? (
         <div className="rounded-lg border border-dashed p-8 text-center">
           <p className="font-medium">Nenhum produtor encontrado</p>
@@ -94,7 +94,14 @@ export function ProducersTable({
                     <TableCell>
                       <DropdownMenu>
                         <DropdownMenuTrigger
-                          render={<Button variant="ghost" size="icon" aria-label={`Ações de ${producer.name}`} />}
+                          render={
+                            <Button
+                              variant="ghost"
+                              size="icon-xs"
+                              className="mx-auto flex size-5"
+                              aria-label={`Ações de ${producer.name}`}
+                            />
+                          }
                         >
                           <MoreHorizontal />
                         </DropdownMenuTrigger>

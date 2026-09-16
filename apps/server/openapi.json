@@ -48,15 +48,7 @@
         "operationId": "ListProducers",
         "parameters": [
           {
-            "name": "name",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "document",
+            "name": "search",
             "required": false,
             "in": "query",
             "schema": {
@@ -245,6 +237,147 @@
         ]
       }
     },
+    "/farms": {
+      "get": {
+        "operationId": "ListFarms",
+        "parameters": [
+          {
+            "name": "name",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "producerId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            }
+          },
+          {
+            "name": "city",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "state",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": 1,
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "maximum": 9007199254740991
+            }
+          },
+          {
+            "name": "perPage",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": 10,
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "maximum": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedFarmResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Farms"
+        ]
+      },
+      "post": {
+        "operationId": "CreateFarm",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "producerId": {
+                    "type": "string"
+                  },
+                  "city": {
+                    "type": "string"
+                  },
+                  "state": {
+                    "type": "string"
+                  },
+                  "totalArea": {
+                    "type": "number"
+                  },
+                  "arableArea": {
+                    "type": "number"
+                  },
+                  "vegetationArea": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "name",
+                  "producerId",
+                  "city",
+                  "state",
+                  "totalArea",
+                  "arableArea",
+                  "vegetationArea"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FarmResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Farms"
+        ]
+      }
+    },
     "/farms/{farmId}/harvests": {
       "get": {
         "operationId": "ListHarvestsByFarm",
@@ -312,69 +445,6 @@
         },
         "tags": [
           "Planted Crops"
-        ]
-      }
-    },
-    "/farms": {
-      "post": {
-        "operationId": "CreateFarm",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "name": {
-                    "type": "string"
-                  },
-                  "producerId": {
-                    "type": "string"
-                  },
-                  "city": {
-                    "type": "string"
-                  },
-                  "state": {
-                    "type": "string"
-                  },
-                  "totalArea": {
-                    "type": "number"
-                  },
-                  "arableArea": {
-                    "type": "number"
-                  },
-                  "vegetationArea": {
-                    "type": "number"
-                  }
-                },
-                "required": [
-                  "name",
-                  "producerId",
-                  "city",
-                  "state",
-                  "totalArea",
-                  "arableArea",
-                  "vegetationArea"
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/FarmResponse"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Farms"
         ]
       }
     },
@@ -952,6 +1022,108 @@
           "arableArea",
           "vegetationArea",
           "createdAt"
+        ]
+      },
+      "PaginatedFarmResponse": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "producerId": {
+                  "type": "string"
+                },
+                "city": {
+                  "type": "string"
+                },
+                "state": {
+                  "type": "string"
+                },
+                "totalArea": {
+                  "type": "number"
+                },
+                "arableArea": {
+                  "type": "number"
+                },
+                "vegetationArea": {
+                  "type": "number"
+                },
+                "createdAt": {
+                  "type": "string"
+                },
+                "owner": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "document": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "cpf",
+                            "cnpj"
+                          ]
+                        },
+                        "value": {
+                          "type": "string"
+                        },
+                        "formatted": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "value",
+                        "formatted"
+                      ]
+                    },
+                    "createdAt": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "document",
+                    "createdAt"
+                  ]
+                }
+              },
+              "required": [
+                "id",
+                "name",
+                "producerId",
+                "city",
+                "state",
+                "totalArea",
+                "arableArea",
+                "vegetationArea",
+                "createdAt",
+                "owner"
+              ]
+            }
+          },
+          "total": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "items",
+          "total"
         ]
       },
       "HarvestResponse": {

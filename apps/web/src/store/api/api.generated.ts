@@ -15,8 +15,7 @@ const injectedRtkApi = api.injectEndpoints({
       query: (queryArg) => ({
         url: `/producers`,
         params: {
-          name: queryArg.name,
-          document: queryArg.document,
+          search: queryArg.search,
           page: queryArg.page,
           perPage: queryArg.perPage,
         },
@@ -53,6 +52,26 @@ const injectedRtkApi = api.injectEndpoints({
     >({
       query: (queryArg) => ({ url: `/producers/${queryArg.producerId}/farms` }),
     }),
+    listFarms: build.query<ListFarmsApiResponse, ListFarmsApiArg>({
+      query: (queryArg) => ({
+        url: `/farms`,
+        params: {
+          name: queryArg.name,
+          producerId: queryArg.producerId,
+          city: queryArg.city,
+          state: queryArg.state,
+          page: queryArg.page,
+          perPage: queryArg.perPage,
+        },
+      }),
+    }),
+    createFarm: build.mutation<CreateFarmApiResponse, CreateFarmApiArg>({
+      query: (queryArg) => ({
+        url: `/farms`,
+        method: "POST",
+        body: queryArg.body,
+      }),
+    }),
     listHarvestsByFarm: build.query<
       ListHarvestsByFarmApiResponse,
       ListHarvestsByFarmApiArg
@@ -65,13 +84,6 @@ const injectedRtkApi = api.injectEndpoints({
     >({
       query: (queryArg) => ({
         url: `/harvests/${queryArg.harvestId}/planted-crops`,
-      }),
-    }),
-    createFarm: build.mutation<CreateFarmApiResponse, CreateFarmApiArg>({
-      query: (queryArg) => ({
-        url: `/farms`,
-        method: "POST",
-        body: queryArg.body,
       }),
     }),
     getFarmById: build.query<GetFarmByIdApiResponse, GetFarmByIdApiArg>({
@@ -171,8 +183,7 @@ export type CreateProducerApiArg = {
 export type ListProducersApiResponse =
   /** status 200  */ PaginatedProducerResponse;
 export type ListProducersApiArg = {
-  name?: string;
-  document?: string;
+  search?: string;
   page?: number;
   perPage?: number;
 };
@@ -196,15 +207,14 @@ export type ListFarmsByProducerApiResponse = /** status 200  */ FarmResponse[];
 export type ListFarmsByProducerApiArg = {
   producerId: string;
 };
-export type ListHarvestsByFarmApiResponse =
-  /** status 200  */ HarvestResponse[];
-export type ListHarvestsByFarmApiArg = {
-  farmId: string;
-};
-export type ListPlantedCropsByHarvestApiResponse =
-  /** status 200  */ PlantedCropResponse[];
-export type ListPlantedCropsByHarvestApiArg = {
-  harvestId: string;
+export type ListFarmsApiResponse = /** status 200  */ PaginatedFarmResponse;
+export type ListFarmsApiArg = {
+  name?: string;
+  producerId?: string;
+  city?: string;
+  state?: string;
+  page?: number;
+  perPage?: number;
 };
 export type CreateFarmApiResponse = /** status 201  */ FarmResponse;
 export type CreateFarmApiArg = {
@@ -217,6 +227,16 @@ export type CreateFarmApiArg = {
     arableArea: number;
     vegetationArea: number;
   };
+};
+export type ListHarvestsByFarmApiResponse =
+  /** status 200  */ HarvestResponse[];
+export type ListHarvestsByFarmApiArg = {
+  farmId: string;
+};
+export type ListPlantedCropsByHarvestApiResponse =
+  /** status 200  */ PlantedCropResponse[];
+export type ListPlantedCropsByHarvestApiArg = {
+  harvestId: string;
 };
 export type GetFarmByIdApiResponse = /** status 200  */ FarmResponse;
 export type GetFarmByIdApiArg = {
@@ -321,6 +341,30 @@ export type FarmResponse = {
   vegetationArea: number;
   createdAt: string;
 };
+export type PaginatedFarmResponse = {
+  items: {
+    id: string;
+    name: string;
+    producerId: string;
+    city: string;
+    state: string;
+    totalArea: number;
+    arableArea: number;
+    vegetationArea: number;
+    createdAt: string;
+    owner: {
+      id: string;
+      name: string;
+      document: {
+        type: "cpf" | "cnpj";
+        value: string;
+        formatted: string;
+      };
+      createdAt: string;
+    };
+  }[];
+  total: number;
+};
 export type HarvestResponse = {
   id: string;
   name: string;
@@ -340,9 +384,10 @@ export const {
   useUpdateProducerMutation,
   useDeleteProducerMutation,
   useListFarmsByProducerQuery,
+  useListFarmsQuery,
+  useCreateFarmMutation,
   useListHarvestsByFarmQuery,
   useListPlantedCropsByHarvestQuery,
-  useCreateFarmMutation,
   useGetFarmByIdQuery,
   useUpdateFarmMutation,
   useDeleteFarmMutation,

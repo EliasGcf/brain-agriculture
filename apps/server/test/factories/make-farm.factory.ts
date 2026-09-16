@@ -6,7 +6,10 @@ import { Injectable } from '@nestjs/common';
 import { FarmsRepository } from '@modules/farms/domain/repositories/farms.repository';
 
 type Overrides = {
+  name?: string;
   producerId?: string;
+  city?: string;
+  state?: string;
   totalArea?: Area;
   arableArea?: Area;
   vegetationArea?: Area;
@@ -21,10 +24,10 @@ export function makeFarm(data: Overrides = {}) {
 
   return Farm.create(
     {
-      name: faker.company.name(),
+      name: data.name ?? faker.company.name(),
       producerId: data.producerId ?? faker.string.uuid(),
-      city: faker.location.city(),
-      state: faker.location.state({ abbreviated: true }),
+      city: data.city ?? faker.location.city(),
+      state: data.state ?? faker.location.state({ abbreviated: true }),
       totalArea: data.totalArea ?? Area.create(totalArea),
       arableArea: data.arableArea ?? Area.create(arableArea),
       vegetationArea: data.vegetationArea ?? Area.create(vegetationArea),

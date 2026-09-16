@@ -43,6 +43,8 @@ import { DeleteProducerUseCase } from '@modules/producers/application/use-cases/
 import { ListFarmsByProducerUseCase } from '@modules/farms/application/use-cases/list-farms-by-producer.use-case';
 import { ListHarvestsByFarmUseCase } from '@modules/farms/application/use-cases/list-harvests-by-farm.use-case';
 import { ListPlantedCropsByHarvestUseCase } from '@modules/farms/application/use-cases/list-planted-crops-by-harvest.use-case';
+import { ListFarmsController } from './controllers/list-farms.controller';
+import { ListFarmsUseCase } from '@modules/farms/application/use-cases/list-farms.use-case';
 
 @Module({
   imports: [DatabaseModule],
@@ -53,6 +55,7 @@ import { ListPlantedCropsByHarvestUseCase } from '@modules/farms/application/use
     UpdateProducerController,
     DeleteProducerController,
     ListFarmsByProducerController,
+    ListFarmsController,
     ListHarvestsByFarmController,
     ListPlantedCropsByHarvestController,
     CreateFarmController,
@@ -88,6 +91,7 @@ import { ListPlantedCropsByHarvestUseCase } from '@modules/farms/application/use
     UpdateProducerUseCase,
     DeleteProducerUseCase,
     ListFarmsByProducerUseCase,
+    ListFarmsUseCase,
     ListHarvestsByFarmUseCase,
     ListPlantedCropsByHarvestUseCase,
   ],
