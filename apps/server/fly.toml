@@ -1,7 +1,7 @@
 app = "brain-agriculture-as1r3a"
 
 [build]
-  dockerfile = "apps/server/Dockerfile"
+  dockerfile = "Dockerfile"
 
 [deploy]
   strategy = "bluegreen"
