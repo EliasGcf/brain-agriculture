@@ -6,7 +6,9 @@ import { RetryCard } from '@components/retry-card';
 import { useGetDashboardMetricsQuery } from '@store/api/api.generated';
 
 export function DashboardPage() {
-  const getDashboardMetrics = useGetDashboardMetricsQuery();
+  const getDashboardMetrics = useGetDashboardMetricsQuery(undefined, {
+    refetchOnFocus: true,
+  });
 
   if (getDashboardMetrics.isError) {
     return (
