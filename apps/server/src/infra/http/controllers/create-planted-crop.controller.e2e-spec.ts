@@ -1,5 +1,6 @@
 import { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
+import cookieParser from 'cookie-parser';
 import request from 'supertest';
 import { App } from 'supertest/types';
 
@@ -11,9 +12,11 @@ import { FarmFactory } from '@test/factories/make-farm.factory';
 import { HarvestFactory } from '@test/factories/make-harvest.factory';
 import { makePlantedCrop } from '@test/factories/make-planted-crop.factory';
 import { ProducerFactory } from '@test/factories/make-producer.factory';
+import { authenticate } from '@test/e2e-auth';
 
 describe('CreatePlantedCropController (e2e)', () => {
   let app: INestApplication<App>;
+  let accessToken: string;
   let producerFactory: ProducerFactory;
   let plantedCropsRepository: PlantedCropsRepository;
   let farmFactory: FarmFactory;
@@ -26,12 +29,14 @@ describe('CreatePlantedCropController (e2e)', () => {
     }).compile();
 
     app = moduleRef.createNestApplication();
+    app.use(cookieParser());
     producerFactory = moduleRef.get<ProducerFactory>(ProducerFactory);
     plantedCropsRepository =
       moduleRef.get<PlantedCropsRepository>(PlantedCropsRepository);
     farmFactory = moduleRef.get<FarmFactory>(FarmFactory);
     harvestFactory = moduleRef.get<HarvestFactory>(HarvestFactory);
     await app.init();
+    accessToken = await authenticate(app);
   });
 
   afterAll(() => app.close());
@@ -43,6 +48,7 @@ describe('CreatePlantedCropController (e2e)', () => {
     const crop = makePlantedCrop({ harvestId: harvest.id.toString() });
     const response = await request(app.getHttpServer())
       .post('/planted-crops')
+      .set('Cookie', accessToken)
       .send({ name: crop.name, harvestId: crop.harvestId })
       .expect(201);
     const rawPlantedCrop = await plantedCropsRepository.findById(response.body.id);

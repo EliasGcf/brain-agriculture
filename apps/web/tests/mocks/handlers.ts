@@ -39,6 +39,9 @@ const parseBody = async <T>(request: Request): Promise<T> => (await request.json
  * I don't see the point in adding another codegen tool, especially since Orval does not support RTK Query.
  */
 export const handlers = [
+  http.post(route('/auth/login'), () => new HttpResponse(null, { status: 200 })),
+  http.get(route('/me'), () => HttpResponse.json({ ok: true })),
+  http.post(route('/auth/logout'), () => new HttpResponse(null, { status: 204 })),
   http.get(brasilRoute('/ibge/municipios/v1/:uf'), () =>
     HttpResponse.json([{ nome: 'Salvador', codigo_ibge: '2927408' }]),
   ),

@@ -80,9 +80,16 @@ export const plantedCrops = pgTable(
   (table) => [index('planted_crops_harvest_id_idx').on(table.harvestId)],
 );
 
+export const users = pgTable('users', {
+  id: uuid().defaultRandom().primaryKey(),
+  email: text().notNull().unique(),
+  password: text().notNull(),
+});
+
 export const schema = {
   producers,
   farms,
   harvests,
   plantedCrops,
+  users,
 };

@@ -1,6 +1,94 @@
 {
   "openapi": "3.0.0",
   "paths": {
+    "/auth/login": {
+      "post": {
+        "description": "Execute esta rota primeiro. Em caso de sucesso, o JWT será salvo automaticamente no cookie HttpOnly access_token. Não é necessário utilizar o botão Authorize.",
+        "operationId": "AuthenticateUser",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+                  },
+                  "password": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "email",
+                  "password"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login realizado. O JWT foi enviado no cookie HttpOnly access_token."
+          }
+        },
+        "summary": "Autenticar usuário",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/me": {
+      "get": {
+        "operationId": "Me",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "ok": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access_token": []
+          }
+        ],
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "operationId": "LogoutUser",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "access_token": []
+          }
+        ],
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
     "/producers": {
       "post": {
         "operationId": "CreateProducer",
@@ -40,6 +128,11 @@
             }
           }
         },
+        "security": [
+          {
+            "access_token": []
+          }
+        ],
         "tags": [
           "Producers"
         ]
@@ -86,6 +179,11 @@
             }
           }
         },
+        "security": [
+          {
+            "access_token": []
+          }
+        ],
         "tags": [
           "Producers"
         ]
@@ -118,6 +216,11 @@
             }
           }
         },
+        "security": [
+          {
+            "access_token": []
+          }
+        ],
         "tags": [
           "Producers"
         ]
@@ -168,6 +271,11 @@
             }
           }
         },
+        "security": [
+          {
+            "access_token": []
+          }
+        ],
         "tags": [
           "Producers"
         ]
@@ -330,7 +438,9 @@
                     "type": "string"
                   },
                   "producerId": {
-                    "type": "string"
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
                   },
                   "city": {
                     "type": "string"
@@ -373,6 +483,11 @@
             }
           }
         },
+        "security": [
+          {
+            "access_token": []
+          }
+        ],
         "tags": [
           "Farms"
         ]
@@ -475,6 +590,11 @@
             }
           }
         },
+        "security": [
+          {
+            "access_token": []
+          }
+        ],
         "tags": [
           "Farms"
         ]
@@ -538,6 +658,11 @@
             }
           }
         },
+        "security": [
+          {
+            "access_token": []
+          }
+        ],
         "tags": [
           "Farms"
         ]
@@ -561,6 +686,11 @@
             "description": ""
           }
         },
+        "security": [
+          {
+            "access_token": []
+          }
+        ],
         "tags": [
           "Farms"
         ]
@@ -606,6 +736,11 @@
             }
           }
         },
+        "security": [
+          {
+            "access_token": []
+          }
+        ],
         "tags": [
           "Harvests"
         ]
@@ -638,6 +773,11 @@
             }
           }
         },
+        "security": [
+          {
+            "access_token": []
+          }
+        ],
         "tags": [
           "Harvests"
         ]
@@ -687,6 +827,11 @@
             }
           }
         },
+        "security": [
+          {
+            "access_token": []
+          }
+        ],
         "tags": [
           "Harvests"
         ]
@@ -710,6 +855,11 @@
             "description": ""
           }
         },
+        "security": [
+          {
+            "access_token": []
+          }
+        ],
         "tags": [
           "Harvests"
         ]
@@ -755,6 +905,11 @@
             }
           }
         },
+        "security": [
+          {
+            "access_token": []
+          }
+        ],
         "tags": [
           "Planted Crops"
         ]
@@ -787,6 +942,11 @@
             }
           }
         },
+        "security": [
+          {
+            "access_token": []
+          }
+        ],
         "tags": [
           "Planted Crops"
         ]
@@ -836,6 +996,11 @@
             }
           }
         },
+        "security": [
+          {
+            "access_token": []
+          }
+        ],
         "tags": [
           "Planted Crops"
         ]
@@ -859,6 +1024,11 @@
             "description": ""
           }
         },
+        "security": [
+          {
+            "access_token": []
+          }
+        ],
         "tags": [
           "Planted Crops"
         ]
@@ -902,13 +1072,21 @@
   },
   "info": {
     "title": "Brain Agriculture",
-    "description": "API documentation for Brain Agriculture",
+    "description": "\n## Autenticação\n\n1. Execute primeiro a rota `POST /auth/login`.\n2. O JWT será salvo automaticamente no cookie HttpOnly `access_token`.\n3. Não é necessário preencher o botão **Authorize**.\n4. Depois disso, execute normalmente as rotas protegidas.\n",
     "version": "1.0",
     "contact": {}
   },
   "tags": [],
   "servers": [],
   "components": {
+    "securitySchemes": {
+      "cookie": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "access_token",
+        "description": "Não preencha manualmente. Execute POST /auth/login para que o cookie seja salvo automaticamente pelo navegador."
+      }
+    },
     "schemas": {
       "ProducerResponse": {
         "type": "object",

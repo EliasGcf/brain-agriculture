@@ -1,11 +1,13 @@
 import { Body, Controller, Param, Patch } from '@nestjs/common';
-import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiCookieAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { z } from 'zod';
 import { UpdateHarvestUseCase } from '@modules/farms/application/use-cases/update-harvest.use-case';
 import { HarvestPresenter } from '../presenters/harvest.presenter';
+import { AUTH_COOKIE } from "@infra/auth/auth.constants";
 
 const UpdateHarvestSchema = z.object({ name: z.string().min(1) });
 
+@ApiCookieAuth(AUTH_COOKIE)
 @ApiTags('Harvests')
 @Controller('harvests/:id')
 export class UpdateHarvestController {

@@ -1,5 +1,6 @@
 import { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
+import cookieParser from 'cookie-parser';
 import request from 'supertest';
 import { App } from 'supertest/types';
 import { DatabaseModule } from '@infra/database/database.module';
@@ -10,9 +11,11 @@ import { HarvestFactory } from '@test/factories/make-harvest.factory';
 import { PlantedCropFactory } from '@test/factories/make-planted-crop.factory';
 import { Area } from '@modules/farms/domain/value-objects/area';
 import { randomUUID } from 'node:crypto';
+import { authenticate } from '@test/e2e-auth';
 
 describe('GetDashboardMetricsController (e2e)', () => {
   let app: INestApplication<App>;
+  let accessToken: string;
   let producerFactory: ProducerFactory;
   let farmFactory: FarmFactory;
   let harvestFactory: HarvestFactory;
@@ -25,11 +28,13 @@ describe('GetDashboardMetricsController (e2e)', () => {
     }).compile();
 
     app = moduleRef.createNestApplication();
+    app.use(cookieParser());
     producerFactory = moduleRef.get<ProducerFactory>(ProducerFactory);
     farmFactory = moduleRef.get<FarmFactory>(FarmFactory);
     harvestFactory = moduleRef.get<HarvestFactory>(HarvestFactory);
     plantedCropFactory = moduleRef.get<PlantedCropFactory>(PlantedCropFactory);
     await app.init();
+    accessToken = await authenticate(app);
   });
 
   afterAll(() => app.close());
@@ -55,7 +60,10 @@ describe('GetDashboardMetricsController (e2e)', () => {
     await plantedCropFactory.make({ harvestId: firstHarvest.id.toString(), name: crop });
     await plantedCropFactory.make({ harvestId: secondHarvest.id.toString(), name: crop.toLowerCase() });
 
-    const response = await request(app.getHttpServer()).get('/metrics').expect(200);
+    const response = await request(app.getHttpServer())
+      .get('/metrics')
+      .set('Cookie', accessToken)
+      .expect(200);
 
     expect(response.body).toEqual(expect.objectContaining({
       farmCount: expect.any(Number),

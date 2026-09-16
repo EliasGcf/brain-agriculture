@@ -1,5 +1,6 @@
 import { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
+import cookieParser from 'cookie-parser';
 import request from 'supertest';
 import { App } from 'supertest/types';
 
@@ -12,9 +13,11 @@ import { FarmsRepository } from '@modules/farms/domain/repositories/farms.reposi
 
 import { makeFarm } from '@test/factories/make-farm.factory';
 import { ProducerFactory } from '@test/factories/make-producer.factory';
+import { authenticate } from '@test/e2e-auth';
 
 describe('CreateFarmController (e2e)', () => {
   let app: INestApplication<App>;
+  let accessToken: string;
 
   let producerFactory: ProducerFactory;
   let farmsRepository: FarmsRepository;
@@ -26,11 +29,13 @@ describe('CreateFarmController (e2e)', () => {
     }).compile();
 
     app = moduleRef.createNestApplication();
+    app.use(cookieParser());
 
     farmsRepository = moduleRef.get<FarmsRepository>(FarmsRepository);
     producerFactory = moduleRef.get<ProducerFactory>(ProducerFactory);
 
     await app.init();
+    accessToken = await authenticate(app);
   });
 
   afterAll(() => app.close());
@@ -51,6 +56,7 @@ describe('CreateFarmController (e2e)', () => {
 
     const response = await request(app.getHttpServer())
       .post('/farms')
+      .set('Cookie', accessToken)
       .send(data)
       .expect(201);
 

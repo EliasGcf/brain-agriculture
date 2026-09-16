@@ -3,6 +3,7 @@ import { DrizzleFarmsRepository } from '@infra/database/drizzle/repositories/dri
 import { DrizzleHarvestsRepository } from '@infra/database/drizzle/repositories/drizzle-harvests.repository';
 import { DrizzlePlantedCropsRepository } from '@infra/database/drizzle/repositories/drizzle-planted-crops.repository';
 import { DrizzleProducersRepository } from '@infra/database/drizzle/repositories/drizzle-producers.repository';
+import { DrizzleUsersRepository } from '@infra/database/drizzle/repositories/drizzle-users.repository';
 import { schema } from '@infra/database/drizzle/schema';
 import { EnvModule } from '@infra/env/env.module';
 import { EnvService } from '@infra/env/env.service';
@@ -10,6 +11,7 @@ import { FarmsRepository } from '@modules/farms/domain/repositories/farms.reposi
 import { HarvestsRepository } from '@modules/farms/domain/repositories/harvests.repository';
 import { PlantedCropsRepository } from '@modules/farms/domain/repositories/planted-crops.repository';
 import { ProducersRepository } from '@modules/producers/domain/repositories/producers.repository';
+import { UsersRepository } from '@modules/auth/domain/repositories/users.repository';
 import { Module, OnApplicationBootstrap, OnApplicationShutdown } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
 import { drizzle } from 'drizzle-orm/node-postgres';
@@ -48,6 +50,10 @@ import { Pool } from 'pg';
       provide: PlantedCropsRepository,
       useClass: DrizzlePlantedCropsRepository,
     },
+    {
+      provide: UsersRepository,
+      useClass: DrizzleUsersRepository,
+    },
   ],
   exports: [
     DRIZZLE,
@@ -55,6 +61,7 @@ import { Pool } from 'pg';
     FarmsRepository,
     HarvestsRepository,
     PlantedCropsRepository,
+    UsersRepository,
   ],
 })
 export class DrizzleModule implements OnApplicationBootstrap, OnApplicationShutdown {

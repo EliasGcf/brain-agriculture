@@ -1,11 +1,13 @@
 import { Body, Controller, Param, Patch } from '@nestjs/common';
-import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiCookieAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { z } from 'zod';
 import { UpdatePlantedCropUseCase } from '@modules/farms/application/use-cases/update-planted-crop.use-case';
 import { PlantedCropPresenter } from '../presenters/planted-crop.presenter';
+import { AUTH_COOKIE } from "@infra/auth/auth.constants";
 
 const UpdatePlantedCropSchema = z.object({ name: z.string().min(1) });
 
+@ApiCookieAuth(AUTH_COOKIE)
 @ApiTags('Planted Crops')
 @Controller('planted-crops/:id')
 export class UpdatePlantedCropController {

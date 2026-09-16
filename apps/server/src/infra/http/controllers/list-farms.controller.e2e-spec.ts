@@ -1,5 +1,6 @@
 import { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
+import cookieParser from 'cookie-parser';
 import request from 'supertest';
 import { App } from 'supertest/types';
 
@@ -9,9 +10,11 @@ import { FarmFactory } from '@test/factories/make-farm.factory';
 import { ProducerFactory } from '@test/factories/make-producer.factory';
 import { FarmsRepository } from '@modules/farms/domain/repositories/farms.repository';
 import { FarmPresenter } from '@infra/http/presenters/farm.presenter';
+import { authenticate } from '@test/e2e-auth';
 
 describe('ListFarmsController (e2e)', () => {
   let app: INestApplication<App>;
+  let accessToken: string;
   let farmFactory: FarmFactory;
   let producerFactory: ProducerFactory;
   let farmsRepository: FarmsRepository;
@@ -23,10 +26,12 @@ describe('ListFarmsController (e2e)', () => {
     }).compile();
 
     app = moduleRef.createNestApplication();
+    app.use(cookieParser());
     farmFactory = moduleRef.get<FarmFactory>(FarmFactory);
     producerFactory = moduleRef.get<ProducerFactory>(ProducerFactory);
     farmsRepository = moduleRef.get<FarmsRepository>(FarmsRepository);
     await app.init();
+    accessToken = await authenticate(app);
   });
 
   afterAll(() => app.close());
@@ -42,6 +47,7 @@ describe('ListFarmsController (e2e)', () => {
 
     const response = await request(app.getHttpServer())
       .get('/farms')
+      .set('Cookie', accessToken)
       .query({
         name: 'green',
         producerId: producer.id.toString(),

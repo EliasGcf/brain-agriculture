@@ -1,5 +1,6 @@
 import { StandardSchemaValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import cookieParser from 'cookie-parser';
 import { NativeLogger } from 'nestjs-pino';
 
 import { AppModule } from './app.module';
@@ -12,8 +13,9 @@ async function bootstrap() {
   const logger = app.get(NativeLogger);
   app.useLogger(logger);
 
-  app.enableCors();
+  app.enableCors({ origin: true, credentials: true });
   app.enableShutdownHooks();
+  app.use(cookieParser());
   app.useGlobalPipes(new StandardSchemaValidationPipe());
 
   const env = app.get(EnvService);

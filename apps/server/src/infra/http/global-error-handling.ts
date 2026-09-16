@@ -5,6 +5,7 @@ import { ResourceNotFoundError } from '@core/errors/common/resource-not-found.er
 import { AppError } from '@core/errors/app.error';
 import { DocumentAlreadyUsedError } from '@modules/producers/application/errors/document-already-used-error';
 import { DocumentValidationError } from '@modules/producers/domain/errors/document-validation-error';
+import { InvalidCredentialsError } from '@modules/auth/application/errors/invalid-credentials.error';
 import {
   Catch,
   ArgumentsHost,
@@ -12,6 +13,7 @@ import {
   ConflictException,
   BadRequestException,
   ForbiddenException,
+  UnauthorizedException,
   NotFoundException,
 } from '@nestjs/common';
 
@@ -31,6 +33,8 @@ export class GlobalErrorHandling extends BaseExceptionFilter {
           throw new NotFoundException(exception.message);
         case DocumentAlreadyUsedError:
           throw new ConflictException(exception.message);
+        case InvalidCredentialsError:
+          throw new UnauthorizedException();
         default:
           throw new InternalServerErrorException();
       }

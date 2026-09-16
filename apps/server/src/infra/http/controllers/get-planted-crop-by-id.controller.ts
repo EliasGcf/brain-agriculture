@@ -1,9 +1,11 @@
 import { Controller, Get, Param } from '@nestjs/common';
-import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiCookieAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { GetPlantedCropByIdUseCase } from '@modules/farms/application/use-cases/get-planted-crop-by-id.use-case';
 import { PlantedCropPresenter } from '../presenters/planted-crop.presenter';
 import z from 'zod';
+import { AUTH_COOKIE } from "@infra/auth/auth.constants";
 
+@ApiCookieAuth(AUTH_COOKIE)
 @ApiTags('Planted Crops')
 @Controller('planted-crops/:id')
 export class GetPlantedCropByIdController {

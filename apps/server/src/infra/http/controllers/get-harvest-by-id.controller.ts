@@ -1,9 +1,11 @@
 import { Controller, Get, Param } from '@nestjs/common';
-import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiCookieAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { GetHarvestByIdUseCase } from '@modules/farms/application/use-cases/get-harvest-by-id.use-case';
 import { HarvestPresenter } from '../presenters/harvest.presenter';
 import z from 'zod';
+import { AUTH_COOKIE } from "@infra/auth/auth.constants";
 
+@ApiCookieAuth(AUTH_COOKIE)
 @ApiTags('Harvests')
 @Controller('harvests/:id')
 export class GetHarvestByIdController {

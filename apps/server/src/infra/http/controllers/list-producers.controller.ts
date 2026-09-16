@@ -1,8 +1,9 @@
 import { Controller, Get, Query } from '@nestjs/common';
-import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiCookieAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { ListProducersUseCase } from '@modules/producers/application/use-cases/list-producers.use-case';
 import { ProducerPresenter } from '../presenters/producer.presenter';
 import z from 'zod';
+import { AUTH_COOKIE } from "@infra/auth/auth.constants";
 
 const QuerySchema = z.object({
   search: z.string().optional(),
@@ -10,6 +11,7 @@ const QuerySchema = z.object({
   perPage: z.coerce.number().optional().default(10),
 });
 
+@ApiCookieAuth(AUTH_COOKIE)
 @ApiTags('Producers')
 @Controller('producers')
 export class ListProducersController {

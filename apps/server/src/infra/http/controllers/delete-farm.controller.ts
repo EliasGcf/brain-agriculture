@@ -1,8 +1,10 @@
 import { Controller, Delete, HttpCode, Param } from '@nestjs/common';
-import { ApiNoContentResponse, ApiTags } from '@nestjs/swagger';
+import { ApiCookieAuth, ApiNoContentResponse, ApiTags } from '@nestjs/swagger';
 import { DeleteFarmUseCase } from '@modules/farms/application/use-cases/delete-farm.use-case';
 import z from 'zod';
+import { AUTH_COOKIE } from "@infra/auth/auth.constants";
 
+@ApiCookieAuth(AUTH_COOKIE)
 @ApiTags('Farms')
 @Controller('farms/:id')
 export class DeleteFarmController {

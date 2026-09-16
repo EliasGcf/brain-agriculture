@@ -1,6 +1,22 @@
 import { api } from "./api";
 const injectedRtkApi = api.injectEndpoints({
   endpoints: (build) => ({
+    authenticateUser: build.mutation<
+      AuthenticateUserApiResponse,
+      AuthenticateUserApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/auth/login`,
+        method: "POST",
+        body: queryArg.body,
+      }),
+    }),
+    me: build.query<MeApiResponse, MeApiArg>({
+      query: () => ({ url: `/me` }),
+    }),
+    logoutUser: build.mutation<LogoutUserApiResponse, LogoutUserApiArg>({
+      query: () => ({ url: `/auth/logout`, method: "POST" }),
+    }),
     createProducer: build.mutation<
       CreateProducerApiResponse,
       CreateProducerApiArg
@@ -175,10 +191,24 @@ const injectedRtkApi = api.injectEndpoints({
     >({
       query: () => ({ url: `/metrics` }),
     }),
+    health: build.query<HealthApiResponse, HealthApiArg>({
+      query: () => ({ url: `/health` }),
+    }),
   }),
   overrideExisting: false,
 });
 export { injectedRtkApi as api };
+export type AuthenticateUserApiResponse = unknown;
+export type AuthenticateUserApiArg = {
+  body: {
+    email: string;
+    password: string;
+  };
+};
+export type MeApiResponse = /** status 200  */ any;
+export type MeApiArg = void;
+export type LogoutUserApiResponse = unknown;
+export type LogoutUserApiArg = void;
 export type CreateProducerApiResponse = /** status 201  */ ProducerResponse;
 export type CreateProducerApiArg = {
   body: {
@@ -315,6 +345,8 @@ export type DeletePlantedCropApiArg = {
 export type GetDashboardMetricsApiResponse =
   /** status 200  */ DashboardMetricsResponse;
 export type GetDashboardMetricsApiArg = void;
+export type HealthApiResponse = unknown;
+export type HealthApiArg = void;
 export type ProducerResponse = {
   id: string;
   name: string;
@@ -405,6 +437,9 @@ export type DashboardMetricsResponse = {
   };
 };
 export const {
+  useAuthenticateUserMutation,
+  useMeQuery,
+  useLogoutUserMutation,
   useCreateProducerMutation,
   useListProducersQuery,
   useGetProducerByIdQuery,
@@ -427,4 +462,5 @@ export const {
   useUpdatePlantedCropMutation,
   useDeletePlantedCropMutation,
   useGetDashboardMetricsQuery,
+  useHealthQuery,
 } = injectedRtkApi;

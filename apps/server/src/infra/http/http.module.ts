@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 
 import { DatabaseModule } from '../database/database.module';
+import { AuthModule } from '@infra/auth/auth.module';
 import { CreateProducerController } from '@infra/http/controllers/create-producer.controller';
 import { CreateProducerUseCase } from '@modules/producers/application/use-cases/create-producer.use-case';
 import { APP_FILTER } from '@nestjs/core';
@@ -48,10 +49,19 @@ import { ListFarmsUseCase } from '@modules/farms/application/use-cases/list-farm
 import { GetDashboardMetricsController } from './controllers/get-dashboard-metrics.controller';
 import { GetDashboardMetricsUseCase } from '@modules/metrics/application/use-cases/get-dashboard-metrics.use-case';
 import { HealthController } from './controllers/health.controller';
+import { AuthenticateUserController } from "@infra/http/controllers/authenticate-user.controller";
+import { AuthenticateUserUseCase } from "@modules/auth/application/use-cases/authenticate-user.use-case";
+import { CryptographyModule } from "@infra/cryptography/cryptography.module";
+import { MeController } from '@infra/http/controllers/me.controller';
+import { LogoutUserController } from '@infra/http/controllers/logout-user.controller';
+import { EnvModule } from "@infra/env/env.module";
 
 @Module({
-  imports: [DatabaseModule],
+  imports: [EnvModule, DatabaseModule, AuthModule, CryptographyModule],
   controllers: [
+    AuthenticateUserController,
+    MeController,
+    LogoutUserController,
     CreateProducerController,
     ListProducersController,
     GetProducerByIdController,
@@ -78,6 +88,7 @@ import { HealthController } from './controllers/health.controller';
   ],
   providers: [
     { provide: APP_FILTER, useClass: GlobalErrorHandling },
+    AuthenticateUserUseCase,
     CreateProducerUseCase,
     CreateFarmUseCase,
     GetFarmByIdUseCase,
