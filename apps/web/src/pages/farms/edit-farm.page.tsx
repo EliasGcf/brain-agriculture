@@ -10,6 +10,10 @@ import { FarmForm } from '@components/farm-form';
 import { HarvestsSection } from '@pages/farms/components/harvests-section';
 import { LoadingCard } from '@components/loading-card';
 import { RetryCard } from '@components/retry-card';
+import { DeleteFarmAlertDialog } from './components/delete-farm-alert-dialog';
+import { Trash2 } from 'lucide-react';
+import { Button } from '@components/ui/button';
+import { useState } from 'react';
 
 function statusOf(error: unknown) {
   return (error as { status?: number })?.status;
@@ -28,6 +32,7 @@ export function EditFarmPage() {
     { refetchOnMountOrArgChange: true },
   );
   const [updateFarm, updateState] = useUpdateFarmMutation();
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   async function handleUpdate(body: CreateFarmApiArg['body']) {
     try {
@@ -36,6 +41,10 @@ export function EditFarmPage() {
     } catch (caughtError) {
       toast.error(updateMessage(caughtError));
     }
+  }
+
+  function handleDeleteSuccess() {
+    navigate('/farms');
   }
 
   if (farmQuery.isLoading) {
@@ -63,7 +72,8 @@ export function EditFarmPage() {
   }
   return (
     <div className="space-y-6">
-      <div>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div>
         <p className="text-sm font-medium text-primary">Fazenda</p>
         <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
           {farmQuery.data.name}
@@ -71,6 +81,20 @@ export function EditFarmPage() {
         <p className="mt-1 text-sm text-muted-foreground">
           Edite os dados da fazenda rural.
         </p>
+        </div>
+        <DeleteFarmAlertDialog
+          farmId={farmQuery.data.id}
+          farmName={farmQuery.data.name}
+          open={isDeleteDialogOpen}
+          onOpenChange={setIsDeleteDialogOpen}
+          onSuccess={handleDeleteSuccess}
+          trigger={
+            <Button variant="destructive">
+              <Trash2 />
+              Excluir fazenda
+            </Button>
+          }
+        />
       </div>
       <FarmForm
         farm={farmQuery.data}

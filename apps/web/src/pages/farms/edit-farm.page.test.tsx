@@ -50,6 +50,17 @@ describe('farm detail route', () => {
     expect(window.location.pathname).toBe(`/farms/${FARM_ID}`)
   })
 
+  it('should be able to delete a farm and return to the farm list', async () => {
+    renderAt(`/farms/${FARM_ID}`)
+
+    expect(await screen.findByRole('heading', { name: 'Green Acres' })).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Excluir fazenda' }))
+    fireEvent.click(screen.getByRole('button', { name: /^Excluir fazenda$/ }))
+
+    expect(await screen.findByRole('heading', { name: 'Fazendas' })).toBeInTheDocument()
+    expect(window.location.pathname).toBe('/farms')
+  })
+
   it('should be able to show the farm form while harvests are loading', async () => {
     server.use(
       http.get(`${baseUrl}/farms/${FARM_ID}/harvests`, async () => {

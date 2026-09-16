@@ -135,6 +135,7 @@ export function FarmsPage() {
           pageCount={pageCount}
           isFetching={farmsQuery.isFetching}
           onPageChange={(page) => setSearchParams({ page })}
+          onDeleteSuccess={async () => { await farmsQuery.refetch() }}
         />
       )}
     </div>

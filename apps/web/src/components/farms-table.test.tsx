@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { MemoryRouter } from 'react-router'
 
 import { FarmsTable } from './farms-table'
@@ -9,7 +9,7 @@ describe('farms table', () => {
   it('should display farm summaries in a table', () => {
     render(
       <MemoryRouter>
-        <FarmsTable farms={[makeFarm()]} />
+        <FarmsTable farms={[makeFarm()]} onDeleteSuccess={vi.fn()} />
       </MemoryRouter>,
     )
 
@@ -27,18 +27,18 @@ describe('farms table', () => {
   })
 
   it('should display an empty state when there are no farms', () => {
-    render(<FarmsTable farms={[]} />)
+    render(<FarmsTable farms={[]} onDeleteSuccess={vi.fn()} />)
 
     expect(screen.getByText('Nenhuma fazenda encontrada')).toBeInTheDocument()
     expect(screen.getByText('As fazendas cadastradas aparecerão nesta lista.')).toBeInTheDocument()
   })
 
-  it('should provide a link and an edit action for a farm', () => {
+  it('should provide edit and delete actions for a farm', () => {
     const farm = makeFarm()
 
     render(
       <MemoryRouter>
-        <FarmsTable farms={[farm]} />
+        <FarmsTable farms={[farm]} onDeleteSuccess={vi.fn()} />
       </MemoryRouter>,
     )
 
@@ -49,5 +49,6 @@ describe('farms table', () => {
     fireEvent.click(screen.getByRole('button', { name: `Ações de ${farm.name}` }))
 
     expect(screen.getByRole('menuitem', { name: 'Editar' })).toBeInTheDocument()
+    expect(screen.getByRole('menuitem', { name: 'Excluir' })).toBeInTheDocument()
   })
 })

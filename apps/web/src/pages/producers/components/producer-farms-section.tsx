@@ -72,7 +72,10 @@ export function ProducerFarmsSection({ producerId }: ProducerFarmsSectionProps) 
       {!listFarmsQuery.isLoading &&
         !listFarmsQuery.error &&
         (!isAddingFarm || Boolean(listFarmsQuery.data?.length)) && (
-          <FarmsTable farms={listFarmsQuery.data ?? []} />
+          <FarmsTable
+            farms={listFarmsQuery.data ?? []}
+            onDeleteSuccess={async () => { await listFarmsQuery.refetch() }}
+          />
         )}
     </section>
   );

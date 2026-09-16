@@ -1,4 +1,5 @@
-import { MoreHorizontal, Pencil } from 'lucide-react';
+import { MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
+import { useState } from 'react';
 import { Link } from 'react-router';
 import {
   DropdownMenu,
@@ -23,6 +24,7 @@ import {
   TableRow,
 } from '@components/ui/table';
 import type { FarmResponse, ProducerResponse } from '@store/api/api.generated';
+import { DeleteFarmAlertDialog } from '@pages/farms/components/delete-farm-alert-dialog';
 
 type FarmWithOwner = FarmResponse & {
   owner?: ProducerResponse;
@@ -34,14 +36,16 @@ type FarmsTableProps = {
   pageCount?: number;
   isFetching?: boolean;
   onPageChange?: (page: number) => void;
+  onDeleteSuccess: () => void | Promise<void>;
 };
 
 function formatArea(value: number) {
   return `${new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 2 }).format(value)} ha`;
 }
 
-export function FarmsTable({ farms, page = 1, pageCount = 1, isFetching, onPageChange }: FarmsTableProps) {
+export function FarmsTable({ farms, page = 1, pageCount = 1, isFetching, onPageChange, onDeleteSuccess }: FarmsTableProps) {
   const hasOwner = farms.some((farm) => farm.owner);
+  const [farmToDelete, setFarmToDelete] = useState<FarmWithOwner | null>(null);
 
   return (
     <div
@@ -111,8 +115,21 @@ export function FarmsTable({ farms, page = 1, pageCount = 1, isFetching, onPageC
                           <Pencil />
                           Editar
                         </DropdownMenuItem>
+                        <DropdownMenuItem variant="destructive" onClick={() => setFarmToDelete(farm)}>
+                          <Trash2 />
+                          Excluir
+                        </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
+                    {farmToDelete?.id === farm.id && (
+                      <DeleteFarmAlertDialog
+                        farmId={farm.id}
+                        farmName={farm.name}
+                        open
+                        onOpenChange={(open) => !open && setFarmToDelete(null)}
+                        onSuccess={onDeleteSuccess}
+                      />
+                    )}
                   </TableCell>
                 </TableRow>
               ))}
