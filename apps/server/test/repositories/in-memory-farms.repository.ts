@@ -50,11 +50,11 @@ export class InMemoryFarmsRepository implements FarmsRepository {
       farmCount: this.items.length,
       totalHectares: fromHundredths(totalHectares),
       hectaresByState: [...stateTotals]
-        .sort(([a], [b]) => a.localeCompare(b))
-        .map(([state, hectares]) => ({ state, hectares: fromHundredths(hectares) })),
+        .map(([state, hectares]) => ({ state, hectares: fromHundredths(hectares) }))
+        .sort((first, second) => second.hectares - first.hectares || first.state.localeCompare(second.state)),
       farmsByCrop: [...cropFarms]
-        .sort(([a], [b]) => a.localeCompare(b))
-        .map(([, entry]) => ({ crop: entry.label, farms: entry.farms.size })),
+        .map(([, entry]) => ({ crop: entry.label, farms: entry.farms.size }))
+        .sort((first, second) => second.farms - first.farms || first.crop.localeCompare(second.crop)),
       landUse: {
         arableArea: fromHundredths(arableArea),
         vegetationArea: fromHundredths(vegetationArea),
