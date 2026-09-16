@@ -1,4 +1,4 @@
-# fly.toml app configuration file generated for brain-agriculture-as1r3a on 2026-09-16T18:23:15Z
+# fly.toml app configuration file generated for brain-agriculture-as1r3a on 2026-09-16T18:32:29Z
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
@@ -11,7 +11,7 @@ primary_region = 'iad'
 
 [deploy]
   strategy = 'bluegreen'
-  release_command = 'npx drizzle-kit@0.31.10 migrate'
+  release_command = 'bunx drizzle-kit migrate'
 
 [http_service]
   internal_port = 3333
