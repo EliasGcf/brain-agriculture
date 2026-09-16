@@ -169,6 +169,12 @@ const injectedRtkApi = api.injectEndpoints({
         method: "DELETE",
       }),
     }),
+    getDashboardMetrics: build.query<
+      GetDashboardMetricsApiResponse,
+      GetDashboardMetricsApiArg
+    >({
+      query: () => ({ url: `/metrics` }),
+    }),
   }),
   overrideExisting: false,
 });
@@ -306,6 +312,9 @@ export type DeletePlantedCropApiResponse = unknown;
 export type DeletePlantedCropApiArg = {
   id: string;
 };
+export type GetDashboardMetricsApiResponse =
+  /** status 200  */ DashboardMetricsResponse;
+export type GetDashboardMetricsApiArg = void;
 export type ProducerResponse = {
   id: string;
   name: string;
@@ -377,6 +386,24 @@ export type PlantedCropResponse = {
   harvestId: string;
   createdAt: string;
 };
+export type DashboardMetricsResponse = {
+  farmCount: number;
+  producerCount: number;
+  totalHectares: number;
+  hectaresByState: {
+    state: string;
+    hectares: number;
+  }[];
+  farmsByCrop: {
+    crop: string;
+    farms: number;
+  }[];
+  landUse: {
+    arableArea: number;
+    vegetationArea: number;
+    otherUses: number;
+  };
+};
 export const {
   useCreateProducerMutation,
   useListProducersQuery,
@@ -399,4 +426,5 @@ export const {
   useGetPlantedCropByIdQuery,
   useUpdatePlantedCropMutation,
   useDeletePlantedCropMutation,
+  useGetDashboardMetricsQuery,
 } = injectedRtkApi;

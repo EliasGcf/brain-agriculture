@@ -18,6 +18,11 @@ import { Document } from '@modules/producers/domain/value-objects/document';
 export class DrizzleProducersRepository implements ProducersRepository {
   constructor(@Inject(DRIZZLE) public readonly db: DB) {}
 
+  async count(): Promise<number> {
+    const [{ total }] = await this.db.select({ total: count() }).from(schema.producers);
+    return total;
+  }
+
   async findById(id: string): Promise<Producer | null> {
     const [producer] = await this.db
       .select()

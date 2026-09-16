@@ -45,6 +45,9 @@ import { ListHarvestsByFarmUseCase } from '@modules/farms/application/use-cases/
 import { ListPlantedCropsByHarvestUseCase } from '@modules/farms/application/use-cases/list-planted-crops-by-harvest.use-case';
 import { ListFarmsController } from './controllers/list-farms.controller';
 import { ListFarmsUseCase } from '@modules/farms/application/use-cases/list-farms.use-case';
+import { GetDashboardMetricsController } from './controllers/get-dashboard-metrics.controller';
+import { GetDashboardMetricsUseCase } from '@modules/metrics/application/use-cases/get-dashboard-metrics.use-case';
+import { HealthController } from './controllers/health.controller';
 
 @Module({
   imports: [DatabaseModule],
@@ -70,6 +73,8 @@ import { ListFarmsUseCase } from '@modules/farms/application/use-cases/list-farm
     GetPlantedCropByIdController,
     UpdatePlantedCropController,
     DeletePlantedCropController,
+    GetDashboardMetricsController,
+    HealthController,
   ],
   providers: [
     { provide: APP_FILTER, useClass: GlobalErrorHandling },
@@ -94,6 +99,7 @@ import { ListFarmsUseCase } from '@modules/farms/application/use-cases/list-farm
     ListFarmsUseCase,
     ListHarvestsByFarmUseCase,
     ListPlantedCropsByHarvestUseCase,
+    GetDashboardMetricsUseCase,
   ],
 })
 export class HttpModule {}

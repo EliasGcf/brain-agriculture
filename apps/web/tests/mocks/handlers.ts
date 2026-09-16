@@ -4,6 +4,7 @@ import type {
   CreateHarvestApiArg,
   CreatePlantedCropApiArg,
   CreateProducerApiArg,
+  DashboardMetricsResponse,
   UpdateFarmApiArg,
   UpdateHarvestApiArg,
   UpdatePlantedCropApiArg,
@@ -122,6 +123,50 @@ export const handlers = [
       items: filtered.slice(start, start + perPage),
       total: filtered.length,
     });
+  }),
+
+  http.get(route('/metrics'), () => {
+    const farmCount = mockData.farms.length;
+    const totalHectares = mockData.farms.reduce((total, farm) => total + farm.totalArea, 0);
+    const hectaresByState = Array.from(
+      mockData.farms.reduce((areas, farm) => {
+        areas.set(farm.state, (areas.get(farm.state) ?? 0) + farm.totalArea);
+        return areas;
+      }, new Map<string, number>()),
+    )
+      .map(([state, hectares]) => ({ state, hectares }))
+      .sort((first, second) => second.hectares - first.hectares || first.state.localeCompare(second.state));
+    const farmIdsByCrop = new Map<string, Set<string>>();
+
+    for (const plantedCrop of mockData.plantedCrops) {
+      const harvest = mockData.harvests.find((item) => item.id === plantedCrop.harvestId);
+      if (!harvest) continue;
+      const farm = mockData.farms.find((item) => item.id === harvest.farmId);
+      if (!farm) continue;
+      const farmIds = farmIdsByCrop.get(plantedCrop.name) ?? new Set<string>();
+      farmIds.add(farm.id);
+      farmIdsByCrop.set(plantedCrop.name, farmIds);
+    }
+
+    const response: DashboardMetricsResponse = {
+      farmCount,
+      producerCount: mockData.producers.length,
+      totalHectares,
+      hectaresByState,
+      farmsByCrop: Array.from(farmIdsByCrop, ([crop, farms]) => ({ crop, farms: farms.size })).sort(
+        (first, second) => second.farms - first.farms || first.crop.localeCompare(second.crop),
+      ),
+      landUse: {
+        arableArea: mockData.farms.reduce((total, farm) => total + farm.arableArea, 0),
+        vegetationArea: mockData.farms.reduce((total, farm) => total + farm.vegetationArea, 0),
+        otherUses: mockData.farms.reduce(
+          (total, farm) => total + farm.totalArea - farm.arableArea - farm.vegetationArea,
+          0,
+        ),
+      },
+    };
+
+    return HttpResponse.json(response);
   }),
 
   http.post(route('/farms'), async ({ request }) => {

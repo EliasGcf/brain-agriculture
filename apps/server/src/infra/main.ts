@@ -1,5 +1,3 @@
-import fs from 'node:fs/promises';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { StandardSchemaValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { NativeLogger } from 'nestjs-pino';
@@ -11,7 +9,8 @@ import { setupSwagger } from '@infra/swagger';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { bufferLogs: true });
 
-  app.useLogger(app.get(NativeLogger));
+  const logger = app.get(NativeLogger);
+  app.useLogger(logger);
 
   app.enableCors();
   app.enableShutdownHooks();
@@ -22,6 +21,7 @@ async function bootstrap() {
   setupSwagger(app, env);
 
   await app.listen(env.get('PORT'));
+  logger.log(`Server is running on port ${env.get('PORT')}`);
 }
 
 bootstrap();

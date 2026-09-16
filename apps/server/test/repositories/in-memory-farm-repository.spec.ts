@@ -7,6 +7,7 @@ import { InMemoryHarvestsRepository } from './in-memory-harvests.repository';
 import { InMemoryPlantedCropsRepository } from './in-memory-planted-crops.repository';
 import { InMemoryProducersRepository } from './in-memory-producers.repository';
 import { makeProducer } from '../factories/make-producer.factory';
+import { Area } from '@modules/farms/domain/value-objects/area';
 
 describe('InMemoryFarmsRepository', () => {
   let plantedCropsRepository: InMemoryPlantedCropsRepository;
@@ -59,6 +60,36 @@ describe('InMemoryFarmsRepository', () => {
         perPage: 10,
       }),
     ).resolves.toEqual({ items: [{ farm: matchingFarm, owner: producer }], total: 1 });
+  });
+
+  it('should be able to aggregate dashboard metrics', async () => {
+    const first = makeFarm({ producerId: 'producer-1' });
+    const second = makeFarm({ producerId: 'producer-2' });
+    await farmsRepository.save(first);
+    await farmsRepository.save(second);
+
+    const metrics = await farmsRepository.getDashboardMetrics();
+
+    expect(metrics.farmCount).toBe(2);
+    expect(metrics.totalHectares).toBe(first.totalArea.value + second.totalArea.value);
+    expect(metrics.landUse.arableArea).toBe(
+      first.arableArea.value + second.arableArea.value,
+    );
+  });
+
+  it('should be able to calculate zero other uses for fractional areas without floating point residue', async () => {
+    await farmsRepository.save(
+      makeFarm({
+        totalArea: Area.create(0.7),
+        arableArea: Area.create(0.6),
+        vegetationArea: Area.create(0.1),
+      }),
+    );
+
+    await expect(farmsRepository.getDashboardMetrics()).resolves.toMatchObject({
+      totalHectares: 0.7,
+      landUse: { arableArea: 0.6, vegetationArea: 0.1, otherUses: 0 },
+    });
   });
 
   it('should be able to replace a farm when saving an existing id', async () => {

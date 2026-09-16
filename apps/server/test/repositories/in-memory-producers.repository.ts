@@ -14,6 +14,10 @@ export class InMemoryProducersRepository implements ProducersRepository {
     farmsRepository.setProducersRepository(this);
   }
 
+  async count(): Promise<number> {
+    return this.items.length;
+  }
+
   async findById(id: string): Promise<Producer | null> {
     return this.items.find((item) => item.id.toString() === id) ?? null;
   }
