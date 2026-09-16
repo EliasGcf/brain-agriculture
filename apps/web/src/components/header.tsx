@@ -39,6 +39,7 @@ export function Header() {
           variant="ghost"
           size="sm"
           aria-label="Sair"
+          className="text-destructive"
           disabled={logoutState.isLoading}
           onClick={handleLogout}
         >
