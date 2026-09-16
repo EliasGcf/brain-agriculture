@@ -1,8 +1,9 @@
 import { Body, Controller, Param, Patch } from '@nestjs/common';
-import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiCookieAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { z } from 'zod';
 import { UpdateFarmUseCase } from '@modules/farms/application/use-cases/update-farm.use-case';
 import { FarmPresenter } from '../presenters/farm.presenter';
+import { AUTH_COOKIE } from "@infra/auth/auth.constants";
 
 const UpdateFarmSchema = z.object({
   name: z.string().optional(),
@@ -14,7 +15,7 @@ const UpdateFarmSchema = z.object({
   vegetationArea: z.number().optional(),
 });
 
-@ApiBearerAuth()
+@ApiCookieAuth(AUTH_COOKIE)
 @ApiTags('Farms')
 @Controller('farms/:id')
 export class UpdateFarmController {

@@ -1,9 +1,10 @@
 import { Controller, Delete, HttpCode, Param } from '@nestjs/common';
-import { ApiBearerAuth, ApiNoContentResponse, ApiTags } from '@nestjs/swagger';
+import { ApiCookieAuth, ApiNoContentResponse, ApiTags } from '@nestjs/swagger';
 import { DeletePlantedCropUseCase } from '@modules/farms/application/use-cases/delete-planted-crop.use-case';
 import z from 'zod';
+import { AUTH_COOKIE } from "@infra/auth/auth.constants";
 
-@ApiBearerAuth()
+@ApiCookieAuth(AUTH_COOKIE)
 @ApiTags('Planted Crops')
 @Controller('planted-crops/:id')
 export class DeletePlantedCropController {

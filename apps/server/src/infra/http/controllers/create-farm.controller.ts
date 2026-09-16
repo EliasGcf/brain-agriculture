@@ -1,9 +1,10 @@
 import { Body, Controller, Post } from '@nestjs/common';
-import { ApiBearerAuth, ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
+import { ApiCookieAuth, ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
 import { z } from 'zod';
 
 import { CreateFarmUseCase } from '@modules/farms/application/use-cases/create-farm.use-case';
 import { FarmPresenter } from '@infra/http/presenters/farm.presenter';
+import { AUTH_COOKIE } from "@infra/auth/auth.constants";
 
 const FarmCreateSchema = z.object({
   name: z.string(),
@@ -17,7 +18,7 @@ const FarmCreateSchema = z.object({
 
 export type CreateFarmBody = z.infer<typeof FarmCreateSchema>;
 
-@ApiBearerAuth()
+@ApiCookieAuth(AUTH_COOKIE)
 @ApiTags('Farms')
 @Controller('farms')
 export class CreateFarmController {

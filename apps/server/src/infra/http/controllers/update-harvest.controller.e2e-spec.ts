@@ -1,5 +1,6 @@
 import { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
+import cookieParser from 'cookie-parser';
 import request from 'supertest';
 import { App } from 'supertest/types';
 
@@ -27,6 +28,7 @@ describe('UpdateHarvestController (e2e)', () => {
     }).compile();
 
     app = moduleRef.createNestApplication();
+    app.use(cookieParser());
     producerFactory = moduleRef.get<ProducerFactory>(ProducerFactory);
     farmFactory = moduleRef.get<FarmFactory>(FarmFactory);
     harvestFactory = moduleRef.get<HarvestFactory>(HarvestFactory);
@@ -44,7 +46,7 @@ describe('UpdateHarvestController (e2e)', () => {
 
     const response = await request(app.getHttpServer())
       .patch(`/harvests/${harvest.id}`)
-      .set('Authorization', `Bearer ${accessToken}`)
+      .set('Cookie', accessToken)
       .send({ name: 'Updated harvest' })
       .expect(200);
 

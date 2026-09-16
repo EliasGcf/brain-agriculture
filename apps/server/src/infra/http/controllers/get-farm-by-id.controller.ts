@@ -1,10 +1,11 @@
 import { Controller, Get, Param } from '@nestjs/common';
-import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiCookieAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { GetFarmByIdUseCase } from '@modules/farms/application/use-cases/get-farm-by-id.use-case';
 import { FarmPresenter } from '../presenters/farm.presenter';
 import z from 'zod';
+import { AUTH_COOKIE } from "@infra/auth/auth.constants";
 
-@ApiBearerAuth()
+@ApiCookieAuth(AUTH_COOKIE)
 @ApiTags('Farms')
 @Controller('farms/:id')
 export class GetFarmByIdController {

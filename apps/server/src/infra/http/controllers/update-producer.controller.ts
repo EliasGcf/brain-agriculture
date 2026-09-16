@@ -1,15 +1,16 @@
 import { Body, Controller, Param, Patch } from '@nestjs/common';
-import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiCookieAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { z } from 'zod';
 import { UpdateProducerUseCase } from '@modules/producers/application/use-cases/update-producer.use-case';
 import { ProducerPresenter } from '../presenters/producer.presenter';
+import { AUTH_COOKIE } from "@infra/auth/auth.constants";
 
 const UpdateProducerSchema = z.object({
   name: z.string().min(1).optional(),
   document: z.string().min(1).optional(),
 });
 
-@ApiBearerAuth()
+@ApiCookieAuth(AUTH_COOKIE)
 @ApiTags('Producers')
 @Controller('producers/:id')
 export class UpdateProducerController {

@@ -1,5 +1,6 @@
 import { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
+import cookieParser from 'cookie-parser';
 import request from 'supertest';
 import { App } from 'supertest/types';
 
@@ -22,6 +23,7 @@ describe('CreateProducerController (e2e)', () => {
     }).compile();
 
     app = moduleRef.createNestApplication();
+    app.use(cookieParser());
     producersRepository = moduleRef.get<ProducersRepository>(ProducersRepository);
     await app.init();
     accessToken = await authenticate(app);
@@ -33,7 +35,7 @@ describe('CreateProducerController (e2e)', () => {
     const producer = makeProducer();
     const response = await request(app.getHttpServer())
       .post('/producers')
-      .set('Authorization', `Bearer ${accessToken}`)
+      .set('Cookie', accessToken)
       .send({ name: producer.name, document: producer.document.value })
       .expect(201);
     const savedProducer = await producersRepository.findById(response.body.id);

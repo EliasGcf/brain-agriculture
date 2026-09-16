@@ -1,5 +1,6 @@
 import { INestApplication, StandardSchemaValidationPipe } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
+import cookieParser from 'cookie-parser';
 import request from 'supertest';
 import { App } from 'supertest/types';
 
@@ -16,6 +17,7 @@ describe('AuthenticateUserController (e2e)', () => {
     }).compile();
 
     app = moduleRef.createNestApplication();
+    app.use(cookieParser());
     app.useGlobalPipes(new StandardSchemaValidationPipe());
     await app.init();
   });
@@ -23,9 +25,10 @@ describe('AuthenticateUserController (e2e)', () => {
   afterAll(() => app.close());
 
   it('should be able to authenticate through POST /auth/login', async () => {
-    const accessToken = await authenticate(app);
+    const authCookie = await authenticate(app);
 
-    expect(accessToken).toEqual(expect.any(String));
+    expect(authCookie).toEqual(expect.stringContaining('access_token='));
+    expect(authCookie).not.toContain('Bearer');
   });
 
   it('should not be able to login with an invalid request body', async () => {
@@ -37,5 +40,14 @@ describe('AuthenticateUserController (e2e)', () => {
 
   it('should not be able to access a protected route without a token', async () => {
     await request(app.getHttpServer()).get('/producers').expect(401);
+  });
+
+  it('should be able to access a protected route with the authentication cookie', async () => {
+    const authCookie = await authenticate(app);
+
+    await request(app.getHttpServer())
+      .get('/producers')
+      .set('Cookie', authCookie)
+      .expect(200);
   });
 });

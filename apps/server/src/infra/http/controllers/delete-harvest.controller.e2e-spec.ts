@@ -1,5 +1,6 @@
 import { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
+import cookieParser from 'cookie-parser';
 import request from 'supertest';
 import { App } from 'supertest/types';
 
@@ -26,6 +27,7 @@ describe('DeleteHarvestController (e2e)', () => {
     }).compile();
 
     app = moduleRef.createNestApplication();
+    app.use(cookieParser());
     producerFactory = moduleRef.get<ProducerFactory>(ProducerFactory);
     harvestsRepository = moduleRef.get<HarvestsRepository>(HarvestsRepository);
     farmFactory = moduleRef.get<FarmFactory>(FarmFactory);
@@ -43,7 +45,7 @@ describe('DeleteHarvestController (e2e)', () => {
 
     await request(app.getHttpServer())
       .delete(`/harvests/${harvest.id}`)
-      .set('Authorization', `Bearer ${accessToken}`)
+      .set('Cookie', accessToken)
       .expect(204);
     await expect(harvestsRepository.findById(harvest.id.toString())).resolves.toBeNull();
   });

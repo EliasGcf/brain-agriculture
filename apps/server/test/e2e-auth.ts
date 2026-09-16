@@ -16,7 +16,7 @@ export async function authenticate(app: INestApplication<App>) {
   await db.insert(schema.users).values({
     id: randomUUID(),
     email,
-    password: await bcrypt.hash(password, 8),
+    password: await bcrypt.hash(password, 10),
   });
 
   const response = await request(app.getHttpServer())
@@ -24,5 +24,5 @@ export async function authenticate(app: INestApplication<App>) {
     .send({ email, password })
     .expect(200);
 
-  return response.body.access_token as string;
+  return response.headers['set-cookie'][0] as string;
 }

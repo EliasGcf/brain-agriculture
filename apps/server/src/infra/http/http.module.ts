@@ -52,11 +52,16 @@ import { HealthController } from './controllers/health.controller';
 import { AuthenticateUserController } from "@infra/http/controllers/authenticate-user.controller";
 import { AuthenticateUserUseCase } from "@modules/auth/application/use-cases/authenticate-user.use-case";
 import { CryptographyModule } from "@infra/cryptography/cryptography.module";
+import { MeController } from '@infra/http/controllers/me.controller';
+import { LogoutUserController } from '@infra/http/controllers/logout-user.controller';
+import { EnvModule } from "@infra/env/env.module";
 
 @Module({
-  imports: [DatabaseModule, AuthModule, CryptographyModule],
+  imports: [EnvModule, DatabaseModule, AuthModule, CryptographyModule],
   controllers: [
     AuthenticateUserController,
+    MeController,
+    LogoutUserController,
     CreateProducerController,
     ListProducersController,
     GetProducerByIdController,

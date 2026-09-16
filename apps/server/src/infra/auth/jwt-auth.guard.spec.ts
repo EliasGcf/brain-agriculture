@@ -24,12 +24,12 @@ describe('JwtAuthGuard', () => {
   const guard = new JwtAuthGuard(jwtService, reflector);
 
   function makeContext(
-    authorization: string | undefined,
+    accessToken: string | undefined,
     controller: typeof PublicController | typeof ProtectedController = ProtectedController,
     handler: Function = ProtectedController.prototype.protectedRoute,
   ) {
-    const request: { headers: { authorization?: string }; user?: Record<string, unknown> } = {
-      headers: { authorization },
+    const request: { cookies?: { access_token?: string }; user?: Record<string, unknown> } = {
+      cookies: accessToken ? { access_token: accessToken } : undefined,
     };
     const context = new ExecutionContextHost([request], controller, handler);
 
@@ -38,19 +38,17 @@ describe('JwtAuthGuard', () => {
 
   it('should be able to authenticate with a valid JWT', async () => {
     const token = await jwtService.signAsync({ sub: USER_ID });
-    const { context, request } = makeContext(`Bearer ${token}`);
+    const { context, request } = makeContext(token);
 
     await expect(guard.canActivate(context)).resolves.toBe(true);
     expect(request.user).toMatchObject({ sub: USER_ID });
   });
 
   it.each([
-    ['missing authorization', undefined],
-    ['malformed authorization', 'Basic token'],
-    ['empty bearer token', 'Bearer '],
-    ['a bearer authorization with extra segments', 'Bearer token extra'],
-  ])('should not be able to authenticate with %s', async (_name, authorization) => {
-    const { context } = makeContext(authorization);
+    ['missing cookie', undefined],
+    ['empty cookie', ''],
+  ])('should not be able to authenticate with %s', async (_name, accessToken) => {
+    const { context } = makeContext(accessToken);
 
     await expect(guard.canActivate(context)).rejects.toBeInstanceOf(
       UnauthorizedException,
@@ -61,7 +59,7 @@ describe('JwtAuthGuard', () => {
     const token = await new JwtService({ secret: 'another-secret' }).signAsync({
       sub: USER_ID,
     });
-    const { context } = makeContext(`Bearer ${token}`);
+    const { context } = makeContext(token);
 
     await expect(guard.canActivate(context)).rejects.toBeInstanceOf(
       UnauthorizedException,
@@ -73,7 +71,7 @@ describe('JwtAuthGuard', () => {
       { sub: USER_ID },
       { expiresIn: -1 },
     );
-    const { context } = makeContext(`Bearer ${token}`);
+    const { context } = makeContext(token);
 
     await expect(guard.canActivate(context)).rejects.toBeInstanceOf(
       UnauthorizedException,
@@ -82,7 +80,7 @@ describe('JwtAuthGuard', () => {
 
   it('should not be able to authenticate with a token whose subject is not a UUID', async () => {
     const token = await jwtService.signAsync({ sub: 'user-id' });
-    const { context } = makeContext(`Bearer ${token}`);
+    const { context } = makeContext(token);
 
     await expect(guard.canActivate(context)).rejects.toBeInstanceOf(
       UnauthorizedException,

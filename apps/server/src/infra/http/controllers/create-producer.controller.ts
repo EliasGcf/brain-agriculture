@@ -1,4 +1,4 @@
-import { ApiBearerAuth, ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
+import { ApiCookieAuth, ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
 import { Body, Controller, Post } from '@nestjs/common';
 import z from 'zod';
 import { cnpj as cnpjTools } from 'cpf-cnpj-validator';
@@ -6,6 +6,7 @@ import { zodValidator } from 'cpf-cnpj-validator/zod';
 
 import { CreateProducerUseCase } from '@modules/producers/application/use-cases/create-producer.use-case';
 import { ProducerPresenter } from '@infra/http/presenters/producer.presenter';
+import { AUTH_COOKIE } from "@infra/auth/auth.constants";
 
 const { cpf, cnpj } = zodValidator(z);
 
@@ -20,7 +21,7 @@ const CreateProducerSchema = z.object(
   { error: 'Invalid producer data' },
 );
 
-@ApiBearerAuth()
+@ApiCookieAuth(AUTH_COOKIE)
 @ApiTags('Producers')
 @Controller('/producers')
 export class CreateProducerController {

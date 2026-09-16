@@ -1,5 +1,6 @@
 import { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
+import cookieParser from 'cookie-parser';
 import request from 'supertest';
 import { App } from 'supertest/types';
 
@@ -28,6 +29,7 @@ describe('CreatePlantedCropController (e2e)', () => {
     }).compile();
 
     app = moduleRef.createNestApplication();
+    app.use(cookieParser());
     producerFactory = moduleRef.get<ProducerFactory>(ProducerFactory);
     plantedCropsRepository =
       moduleRef.get<PlantedCropsRepository>(PlantedCropsRepository);
@@ -46,7 +48,7 @@ describe('CreatePlantedCropController (e2e)', () => {
     const crop = makePlantedCrop({ harvestId: harvest.id.toString() });
     const response = await request(app.getHttpServer())
       .post('/planted-crops')
-      .set('Authorization', `Bearer ${accessToken}`)
+      .set('Cookie', accessToken)
       .send({ name: crop.name, harvestId: crop.harvestId })
       .expect(201);
     const rawPlantedCrop = await plantedCropsRepository.findById(response.body.id);

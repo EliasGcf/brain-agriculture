@@ -10,12 +10,14 @@ import { Request } from 'express';
 import { z } from 'zod';
 
 import { IS_PUBLIC_KEY } from "@infra/auth/public.decorator";
+import { AUTH_COOKIE } from "@infra/auth/auth.constants";
 
 const PayloadSchema = z.object({
   sub: z.uuid()
 });
 
 type AuthenticatedRequest = Request & {
+  cookies?: { access_token?: string };
   user?: z.infer<typeof PayloadSchema>
 };
 
@@ -31,11 +33,11 @@ export class JwtAuthGuard implements CanActivate {
       context.getHandler(),
       context.getClass(),
     ]);
+
     if (isPublic) return true;
 
     const request = context.switchToHttp().getRequest<AuthenticatedRequest>();
-    const authorization = request.headers.authorization;
-    const [, token] = authorization?.match(/^Bearer ([^\s]+)$/) ?? [];
+    const token = request.cookies?.[AUTH_COOKIE];
 
     if (!token) throw new UnauthorizedException();
 
@@ -49,4 +51,3 @@ export class JwtAuthGuard implements CanActivate {
     }
   }
 }
-
