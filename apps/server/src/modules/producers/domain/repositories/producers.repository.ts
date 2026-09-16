@@ -12,6 +12,7 @@ export interface FindManyProducersParams {
 export type FindManyProducersResult = PaginatedResult<ListProducersDto>;
 
 export abstract class ProducersRepository {
+  abstract count(): Promise<number>;
   abstract findById(id: string): Promise<Producer | null>;
   abstract findByDocument(document: string): Promise<Producer | null>;
   abstract findMany(params: FindManyProducersParams): Promise<FindManyProducersResult>;

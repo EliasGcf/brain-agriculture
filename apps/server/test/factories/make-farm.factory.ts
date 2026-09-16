@@ -7,6 +7,7 @@ import { FarmsRepository } from '@modules/farms/domain/repositories/farms.reposi
 
 type Overrides = {
   producerId?: string;
+  state?: string;
   totalArea?: Area;
   arableArea?: Area;
   vegetationArea?: Area;
@@ -24,7 +25,7 @@ export function makeFarm(data: Overrides = {}) {
       name: faker.company.name(),
       producerId: data.producerId ?? faker.string.uuid(),
       city: faker.location.city(),
-      state: faker.location.state({ abbreviated: true }),
+      state: data.state ?? faker.location.state({ abbreviated: true }),
       totalArea: data.totalArea ?? Area.create(totalArea),
       arableArea: data.arableArea ?? Area.create(arableArea),
       vegetationArea: data.vegetationArea ?? Area.create(vegetationArea),

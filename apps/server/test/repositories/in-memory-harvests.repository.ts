@@ -5,7 +5,7 @@ import { InMemoryPlantedCropsRepository } from './in-memory-planted-crops.reposi
 export class InMemoryHarvestsRepository implements HarvestsRepository {
   public items: Harvest[] = [];
 
-  constructor(private readonly plantedCropsRepository: InMemoryPlantedCropsRepository) {}
+  constructor(public readonly plantedCropsRepository: InMemoryPlantedCropsRepository) {}
 
   async findById(id: string) {
     return this.items.find((item) => item.id.toString() === id) ?? null;

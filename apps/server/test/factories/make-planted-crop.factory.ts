@@ -4,12 +4,13 @@ import { Injectable } from '@nestjs/common';
 import { PlantedCropsRepository } from '@modules/farms/domain/repositories/planted-crops.repository';
 
 type Overrides = {
+  name?: string;
   harvestId?: string;
 };
 
 export function makePlantedCrop(data: Overrides = {}) {
   return PlantedCrop.create({
-    name: faker.commerce.productName(),
+    name: data.name ?? faker.commerce.productName(),
     harvestId: data.harvestId ?? faker.string.uuid(),
   });
 }
