@@ -12,7 +12,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@components/ui/alert-dialog'
-import { useDeleteProducerMutation } from '@store/api.generated'
+import { useDeleteProducerMutation } from '@store/api/api.generated'
 import { Spinner } from '@components/ui/spinner'
 
 type DeleteProducerAlertDialogProps = {

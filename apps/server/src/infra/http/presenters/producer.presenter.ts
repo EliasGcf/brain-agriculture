@@ -4,7 +4,7 @@ import { Producer } from '@modules/producers/domain/entities/producer';
 import { createZodDto } from 'nestjs-zod';
 import z from 'zod';
 
-const schema = z.object({
+export const ProducerSchema = z.object({
   id: z.string(),
   name: z.string(),
   document: z.object({
@@ -16,11 +16,11 @@ const schema = z.object({
 });
 
 const PaginatedSchema = z.object({
-  items: z.array(schema.and(z.object({ farmsCount: z.number() }))),
+  items: z.array(ProducerSchema.and(z.object({ farmsCount: z.number() }))),
   total: z.number(),
 });
 
-class ProducerResponse extends createZodDto(schema) {}
+class ProducerResponse extends createZodDto(ProducerSchema) {}
 class PaginatedProducerResponse extends createZodDto(PaginatedSchema) {}
 
 export class ProducerPresenter {
@@ -28,7 +28,7 @@ export class ProducerPresenter {
   static PaginatedResponse = PaginatedProducerResponse;
 
   static toHTTP(producer: Producer) {
-    return schema.parse({
+    return ProducerSchema.parse({
       id: producer.id.toString(),
       name: producer.name,
       document: {

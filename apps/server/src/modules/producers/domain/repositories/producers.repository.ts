@@ -3,8 +3,7 @@ import { PaginatedResult } from '@core/dto/paginated-result';
 import { ListProducersDto } from '@modules/producers/application/dto/list-producers.dto';
 
 export interface FindManyProducersParams {
-  name?: string;
-  document?: string;
+  search?: string;
   page: number;
   perPage: number;
 }

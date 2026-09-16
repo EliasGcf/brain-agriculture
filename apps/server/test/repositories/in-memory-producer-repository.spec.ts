@@ -28,17 +28,39 @@ describe('InMemoryProducersRepository', () => {
     await expect(repository.findById(producer.id.toString())).resolves.toBe(producer);
   });
 
-  it('should be able to find producers with partial filters and pagination', async () => {
+  it('should be able to find producers with partial unified search and pagination', async () => {
     repository.items = [
       makeProducer({ name: 'Maria Silva' }),
       makeProducer({ name: 'João Souza' }),
     ];
 
-    const result = await repository.findMany({ name: 'sil', page: 1, perPage: 10 });
+    const result = await repository.findMany({ search: 'sil', page: 1, perPage: 10 });
 
     expect(result.items).toHaveLength(1);
     expect(result.items[0].producer.name).toBe('Maria Silva');
     expect(result.total).toBe(1);
+  });
+
+  it('should be able to find producers by a formatted document with unified search', async () => {
+    const producer = await repository.save(
+      makeProducer({ name: 'Producer by document', document: '529.982.247-25' }),
+    );
+
+    const result = await repository.findMany({ search: '529.982.247-2', page: 1, perPage: 10 });
+
+    expect(result.items.map((item) => item.producer)).toEqual([producer]);
+  });
+
+  it('should be able to match name or document with unified search', async () => {
+    const nameMatch = makeProducer({ name: 'Maria Silva', document: '52998224725' });
+    const documentMatch = makeProducer({ name: 'João Souza', document: '11144477735' });
+    repository.items = [nameMatch, documentMatch];
+
+    const result = await repository.findMany({ search: 'sil', page: 1, perPage: 10 });
+    const documentResult = await repository.findMany({ search: '444777', page: 1, perPage: 10 });
+
+    expect(result.items.map((item) => item.producer)).toEqual([nameMatch]);
+    expect(documentResult.items.map((item) => item.producer)).toEqual([documentMatch]);
   });
 
   it('should be able to find a producer by normalized document', async () => {

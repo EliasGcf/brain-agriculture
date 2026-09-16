@@ -3,7 +3,7 @@ import { useEffect, type SubmitEvent } from 'react';
 import { useNavigate } from 'react-router';
 import { parseAsInteger, parseAsString, useQueryStates } from 'nuqs';
 
-import { useListProducersQuery } from '@store/api.generated';
+import { useListProducersQuery } from '@store/api/api.generated';
 import { Button } from '@components/ui/button';
 import { Input } from '@components/ui/input';
 import { Label } from '@components/ui/label';
@@ -20,8 +20,7 @@ export function ListProducersPage() {
 
   const [searchParams, setSearchParams] = useQueryStates(
     {
-      name: parseAsString.withDefault(''),
-      document: parseAsString.withDefault(''),
+      search: parseAsString.withDefault(''),
       page: parseAsInteger.withDefault(1),
     },
     { history: 'push' },
@@ -29,8 +28,7 @@ export function ListProducersPage() {
 
   const listProducersQuery = useListProducersQuery(
     {
-      document: searchParams.document,
-      name: searchParams.name,
+      search: searchParams.search,
       page: searchParams.page,
       perPage: PAGE_SIZE,
     },
@@ -51,8 +49,7 @@ export function ListProducersPage() {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
     setSearchParams({
-      name: String(formData.get('name') ?? '').trim() || null,
-      document: String(formData.get('document') ?? '').trim() || null,
+      search: String(formData.get('search') ?? '').trim() || null,
       page: 1,
     });
   }
@@ -87,28 +84,17 @@ export function ListProducersPage() {
       <form
         aria-label="Buscar produtores"
         className="flex max-w-3xl flex-col gap-4 sm:flex-row sm:items-end"
-        key={`${searchParams.name}:${searchParams.document}`}
+        key={searchParams.search}
         onSubmit={handleSearchSubmit}
       >
-        <div className="grid flex-1 gap-4 sm:grid-cols-2">
-          <div className="space-y-2">
-            <Label htmlFor="producer-name">Nome do produtor</Label>
-            <Input
-              id="producer-name"
-              name="name"
-              placeholder="Digite o nome"
-              defaultValue={searchParams.name}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="producer-document">CPF ou CNPJ</Label>
-            <Input
-              id="producer-document"
-              name="document"
-              placeholder="Digite o CPF ou CNPJ"
-              defaultValue={searchParams.document}
-            />
-          </div>
+        <div className="flex-1 space-y-2">
+          <Label htmlFor="producer-search">Nome ou CPF/CNPJ</Label>
+          <Input
+            id="producer-search"
+            name="search"
+            placeholder="Digite o nome ou CPF/CNPJ"
+            defaultValue={searchParams.search}
+          />
         </div>
         <Button type="submit">
           {listProducersQuery.isFetching ? <Spinner /> : <Search />}

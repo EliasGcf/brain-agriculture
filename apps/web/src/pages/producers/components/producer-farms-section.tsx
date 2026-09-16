@@ -6,7 +6,7 @@ import {
   useCreateFarmMutation,
   useListFarmsByProducerQuery,
   type CreateFarmApiArg,
-} from '@store/api.generated';
+} from '@store/api/api.generated';
 import { Button } from '@components/ui/button';
 import { FarmForm } from '@components/farm-form';
 import { FarmsTable } from '@components/farms-table';
@@ -19,7 +19,10 @@ type ProducerFarmsSectionProps = {
 
 export function ProducerFarmsSection({ producerId }: ProducerFarmsSectionProps) {
   const [isAddingFarm, setIsAddingFarm] = useState(false);
-  const listFarmsQuery = useListFarmsByProducerQuery({ producerId });
+  const listFarmsQuery = useListFarmsByProducerQuery(
+    { producerId },
+    { refetchOnMountOrArgChange: true },
+  );
   const [createFarm, createFarmState] = useCreateFarmMutation();
 
   async function handleCreateFarm(body: CreateFarmApiArg['body']) {

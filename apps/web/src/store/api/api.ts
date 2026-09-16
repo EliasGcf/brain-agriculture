@@ -1,10 +1,11 @@
+import { env } from "@env";
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 export const api = createApi({
   reducerPath: 'api',
   baseQuery: async (...args) => {
     // await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate network latency
-    return fetchBaseQuery({ baseUrl: import.meta.env.VITE_API_BASE_URL })(...args);
+    return fetchBaseQuery({ baseUrl: env.VITE_API_BASE_URL })(...args);
   },
   endpoints: () => ({}),
 });

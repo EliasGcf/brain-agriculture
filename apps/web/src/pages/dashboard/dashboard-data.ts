@@ -1,3 +1,3 @@
-import type { DashboardMetricsResponse } from '@store/api.generated'
+import type { DashboardMetricsResponse } from '@store/api/api.generated'
 
 export type DashboardData = DashboardMetricsResponse

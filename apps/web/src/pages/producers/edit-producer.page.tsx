@@ -6,7 +6,7 @@ import { Link, useNavigate, useParams } from 'react-router';
 import {
   useGetProducerByIdQuery,
   useUpdateProducerMutation,
-} from '@store/api.generated';
+} from '@store/api/api.generated';
 import { Button } from '@components/ui/button';
 import { Separator } from '@components/ui/separator';
 import { LoadingCard } from '@components/loading-card';

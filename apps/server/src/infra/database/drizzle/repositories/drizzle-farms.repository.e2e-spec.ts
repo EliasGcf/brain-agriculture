@@ -65,6 +65,24 @@ describe('DrizzleFarmsRepository', () => {
     ).resolves.toEqual([farm]);
   });
 
+  it('should be able to list farms with their owner', async () => {
+    const producer = await producersRepository.save(makeProducer());
+    const farm = await farmsRepository.save(
+      makeFarm({ producerId: producer.id.toString() }),
+    );
+
+    await expect(
+      farmsRepository.findMany({
+        producerId: producer.id.toString(),
+        page: 1,
+        perPage: 10,
+      }),
+    ).resolves.toEqual({
+      items: [{ farm, owner: producer }],
+      total: 1,
+    });
+  });
+
   it('should be able to delete a persisted farm', async () => {
     const producer = await producersRepository.save(makeProducer());
     const farm = await farmsRepository.save(

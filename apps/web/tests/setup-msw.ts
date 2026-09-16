@@ -2,7 +2,7 @@ import { afterAll, afterEach, beforeAll } from 'vitest';
 
 import { resetMockData } from './mocks/data';
 import { server } from './mocks/server';
-import { api } from '../src/store/api.generated';
+import { api } from '../src/store/api/api.generated';
 import { apiStore } from '../src/store/store';
 
 beforeAll(() => server.listen({ onUnhandledRequest: 'error' }));

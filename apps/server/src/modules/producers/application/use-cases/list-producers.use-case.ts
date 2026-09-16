@@ -4,8 +4,7 @@ import { ProducersRepository } from '@modules/producers/domain/repositories/prod
 import { Injectable } from '@nestjs/common';
 
 export interface Params {
-  name?: string;
-  document?: string;
+  search?: string;
   page: number;
   perPage: number;
 }

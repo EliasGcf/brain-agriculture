@@ -3,7 +3,7 @@ import { DashboardEmptyState } from './components/dashboard-empty-state';
 import { DashboardLoading } from './components/dashboard-loading';
 import { DashboardMetrics } from './components/dashboard-metrics';
 import { RetryCard } from '@components/retry-card';
-import { useGetDashboardMetricsQuery } from '@store/api.generated';
+import { useGetDashboardMetricsQuery } from '@store/api/api.generated';
 
 export function DashboardPage() {
   const getDashboardMetrics = useGetDashboardMetricsQuery();

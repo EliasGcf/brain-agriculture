@@ -43,6 +43,8 @@ import { DeleteProducerUseCase } from '@modules/producers/application/use-cases/
 import { ListFarmsByProducerUseCase } from '@modules/farms/application/use-cases/list-farms-by-producer.use-case';
 import { ListHarvestsByFarmUseCase } from '@modules/farms/application/use-cases/list-harvests-by-farm.use-case';
 import { ListPlantedCropsByHarvestUseCase } from '@modules/farms/application/use-cases/list-planted-crops-by-harvest.use-case';
+import { ListFarmsController } from './controllers/list-farms.controller';
+import { ListFarmsUseCase } from '@modules/farms/application/use-cases/list-farms.use-case';
 import { GetDashboardMetricsController } from './controllers/get-dashboard-metrics.controller';
 import { GetDashboardMetricsUseCase } from '@modules/metrics/application/use-cases/get-dashboard-metrics.use-case';
 import { HealthController } from './controllers/health.controller';
@@ -56,6 +58,7 @@ import { HealthController } from './controllers/health.controller';
     UpdateProducerController,
     DeleteProducerController,
     ListFarmsByProducerController,
+    ListFarmsController,
     ListHarvestsByFarmController,
     ListPlantedCropsByHarvestController,
     CreateFarmController,
@@ -93,6 +96,7 @@ import { HealthController } from './controllers/health.controller';
     UpdateProducerUseCase,
     DeleteProducerUseCase,
     ListFarmsByProducerUseCase,
+    ListFarmsUseCase,
     ListHarvestsByFarmUseCase,
     ListPlantedCropsByHarvestUseCase,
     GetDashboardMetricsUseCase,

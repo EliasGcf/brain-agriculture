@@ -81,7 +81,7 @@ describe('DrizzleProducersRepository', () => {
     );
 
     const firstPage = await producersRepository.findMany({
-      name: marker,
+      search: marker,
       page: 1,
       perPage: 2,
     });
@@ -95,8 +95,7 @@ describe('DrizzleProducersRepository', () => {
     });
 
     const filteredPage = await producersRepository.findMany({
-      name: 'matching',
-      document: matchingProducer.document.value.slice(0, 8),
+      search: 'matching',
       page: 1,
       perPage: 10,
     });
@@ -106,8 +105,19 @@ describe('DrizzleProducersRepository', () => {
       total: 1,
     });
 
+    const documentPage = await producersRepository.findMany({
+      search: matchingProducer.document.formatted,
+      page: 1,
+      perPage: 10,
+    });
+
+    expect(documentPage).toEqual({
+      items: [{ producer: matchingProducer, farmsCount: 0 }],
+      total: 1,
+    });
+
     const emptyPage = await producersRepository.findMany({
-      name: 'does not exist',
+      search: 'does not exist',
       page: 1,
       perPage: 10,
     });

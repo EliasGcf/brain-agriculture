@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { and, asc, count, desc, eq, getTableColumns, ilike } from 'drizzle-orm';
+import { asc, count, desc, eq, ilike, or } from 'drizzle-orm';
 
 import { Producer } from '@modules/producers/domain/entities/producer';
 import {
@@ -12,6 +12,7 @@ import { schema } from '@infra/database/drizzle/schema';
 
 import { DrizzleProducerMapper } from '@infra/database/drizzle/mappers/drizzle-producer.mapper';
 import { type DB, DRIZZLE } from '@infra/database/drizzle/drizzle.constants';
+import { Document } from '@modules/producers/domain/value-objects/document';
 
 @Injectable()
 export class DrizzleProducersRepository implements ProducersRepository {
@@ -47,25 +48,19 @@ export class DrizzleProducersRepository implements ProducersRepository {
   }
 
   async findMany(params: FindManyProducersParams): Promise<FindManyProducersResult> {
-    const conditions = [];
+    const conditions = [ilike(schema.producers.name, `%${params.search}%`)];
 
-    if (params.name) {
-      conditions.push(ilike(schema.producers.name, `%${params.name}%`));
+    const normalizedSearch = params.search ? Document.strip(params.search) : '';
+    if (normalizedSearch) {
+      conditions.push(ilike(schema.producers.document, `%${normalizedSearch}%`));
     }
 
-    if (params.document) {
-      conditions.push(ilike(schema.producers.document, `%${params.document}%`));
-    }
-
-    const where = conditions.length > 0 ? and(...conditions) : undefined;
+    const where = conditions.length > 0 ? or(...conditions) : undefined;
     const offset = (params.page - 1) * params.perPage;
 
     const [rows, [{ total }]] = await Promise.all([
       this.db
-        .select({
-          ...getTableColumns(schema.producers),
-          farmsCount: count(schema.farms.id),
-        })
+        .select({ producer: schema.producers, farmsCount: count(schema.farms.id) })
         .from(schema.producers)
         .leftJoin(schema.farms, eq(schema.farms.producerId, schema.producers.id))
         .where(where)
@@ -77,8 +72,8 @@ export class DrizzleProducersRepository implements ProducersRepository {
     ]);
 
     return {
-      items: rows.map(({ farmsCount, ...raw }) => ({
-        producer: DrizzleProducerMapper.toDomain(raw),
+      items: rows.map(({ farmsCount, producer }) => ({
+        producer: DrizzleProducerMapper.toDomain(producer),
         farmsCount,
       })),
       total,

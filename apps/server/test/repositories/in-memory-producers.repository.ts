@@ -5,11 +5,14 @@ import {
 } from '@modules/producers/domain/repositories/producers.repository';
 import { Producer } from '@modules/producers/domain/entities/producer';
 import { InMemoryFarmsRepository } from './in-memory-farms.repository';
+import { Document } from '@modules/producers/domain/value-objects/document';
 
 export class InMemoryProducersRepository implements ProducersRepository {
   public items: Producer[] = [];
 
-  constructor(private readonly farmsRepository: InMemoryFarmsRepository) {}
+  constructor(private readonly farmsRepository: InMemoryFarmsRepository) {
+    farmsRepository.setProducersRepository(this);
+  }
 
   async count(): Promise<number> {
     return this.items.length;
@@ -24,11 +27,15 @@ export class InMemoryProducersRepository implements ProducersRepository {
   }
 
   async findMany(params: FindManyProducersParams): Promise<FindManyProducersResult> {
-    const name = params.name?.toLocaleLowerCase();
-    const document = params.document;
+    const search = params.search?.toLocaleLowerCase();
+    const normalizedSearch = params.search ? Document.strip(params.search) : undefined;
     const filtered = this.items
-      .filter((item) => !name || item.name.toLocaleLowerCase().includes(name))
-      .filter((item) => !document || item.document.value.includes(document))
+      .filter(
+        (item) =>
+          !search ||
+          item.name.toLocaleLowerCase().includes(search) ||
+          (!!normalizedSearch && item.document.value.includes(normalizedSearch)),
+      )
       .sort(
         (a, b) =>
           b.createdAt.getTime() - a.createdAt.getTime() ||

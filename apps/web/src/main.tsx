@@ -2,8 +2,9 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 
 import { App } from "@app.tsx"
+import { env } from "@env"
 
-if (import.meta.env.DEV && import.meta.env.VITE_ENABLE_MSW === 'true') {
+if (env.DEV && env.VITE_ENABLE_MSW) {
   const { worker } = await import('./msw')
   await worker.start({ onUnhandledRequest: 'bypass' })
 }
