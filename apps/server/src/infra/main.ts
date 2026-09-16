@@ -13,7 +13,7 @@ async function bootstrap() {
   const logger = app.get(NativeLogger);
   app.useLogger(logger);
 
-  app.enableCors();
+  app.enableCors({ origin: true, credentials: true });
   app.enableShutdownHooks();
   app.use(cookieParser());
   app.useGlobalPipes(new StandardSchemaValidationPipe());

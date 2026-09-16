@@ -23,7 +23,7 @@ describe('producer create route', () => {
     }))
 
     renderCreateProducer()
-    fireEvent.change(screen.getByLabelText('Nome completo ou razão social'), { target: { value: 'Novo Produtor' } })
+    fireEvent.change(await screen.findByLabelText('Nome completo ou razão social'), { target: { value: 'Novo Produtor' } })
     fireEvent.change(screen.getByLabelText('CPF ou CNPJ'), { target: { value: '11111111111' } })
     fireEvent.click(screen.getByRole('button', { name: 'Salvar produtor' }))
     expect(await screen.findByText('Informe um CPF ou CNPJ válido.')).toBeInTheDocument()
@@ -33,7 +33,7 @@ describe('producer create route', () => {
 
   it('should be able to create a producer through the API and navigate to the producer list', async () => {
     renderCreateProducer()
-    fireEvent.change(screen.getByLabelText('Nome completo ou razão social'), { target: { value: 'Novo Produtor' } })
+    fireEvent.change(await screen.findByLabelText('Nome completo ou razão social'), { target: { value: 'Novo Produtor' } })
     fireEvent.change(screen.getByLabelText('CPF ou CNPJ'), { target: { value: '529.982.247-25' } })
     fireEvent.click(screen.getByRole('button', { name: 'Salvar produtor' }))
     await waitFor(() => expect(window.location.pathname).toBe('/producers'), { timeout: 3000 })
@@ -57,7 +57,7 @@ describe('producer create route', () => {
     }))
 
     renderCreateProducer()
-    fireEvent.change(screen.getByLabelText('Nome completo ou razão social'), { target: { value: 'Novo Produtor' } })
+    fireEvent.change(await screen.findByLabelText('Nome completo ou razão social'), { target: { value: 'Novo Produtor' } })
     fireEvent.change(screen.getByLabelText('CPF ou CNPJ'), { target: { value: '11.222.333/0001-81' } })
     fireEvent.click(screen.getByRole('button', { name: 'Salvar produtor' }))
 
@@ -68,7 +68,7 @@ describe('producer create route', () => {
   it('should display a toast when the server rejects the document', async () => {
     server.use(http.post(`${baseUrl}/producers`, () => HttpResponse.json({ message: 'Document already exists' }, { status: 409 })))
     renderCreateProducer()
-    fireEvent.change(screen.getByLabelText('Nome completo ou razão social'), { target: { value: 'Novo Produtor' } })
+    fireEvent.change(await screen.findByLabelText('Nome completo ou razão social'), { target: { value: 'Novo Produtor' } })
     fireEvent.change(screen.getByLabelText('CPF ou CNPJ'), { target: { value: '52998224725' } })
     fireEvent.click(screen.getByRole('button', { name: 'Salvar produtor' }))
     expect(await screen.findByText('Este CPF ou CNPJ já está cadastrado.', undefined, { timeout: 3000 })).toBeInTheDocument()

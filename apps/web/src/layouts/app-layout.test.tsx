@@ -13,10 +13,10 @@ afterEach(() => {
 })
 
 describe('application layout', () => {
-  it('allows the desktop sidebar to be collapsed and expanded', () => {
+  it('allows the desktop sidebar to be collapsed and expanded', async () => {
     renderAt('/')
 
-    const toggle = screen.getByRole('button', {
+    const toggle = await screen.findByRole('button', {
       name: 'Abrir ou recolher navegação',
     })
     const sidebar = document.querySelector('[data-slot="sidebar"][data-state]')
@@ -32,7 +32,7 @@ describe('application layout', () => {
     window.innerWidth = 375
     renderAt('/')
 
-    const toggle = screen.getByRole('button', {
+    const toggle = await screen.findByRole('button', {
       name: 'Abrir ou recolher navegação',
     })
 
@@ -47,7 +47,7 @@ describe('application layout', () => {
     window.history.pushState({}, '', '/')
     renderAt('/producers')
 
-    fireEvent.click(screen.getByRole('button', { name: 'Voltar' }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Voltar' }))
 
     await waitFor(() => {
       expect(

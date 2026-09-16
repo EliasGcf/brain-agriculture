@@ -8,19 +8,27 @@ import { EditFarmPage } from './pages/farms/edit-farm.page'
 import { ListProducersPage } from './pages/producers/list-producers.page'
 import { CreateProducerPage } from './pages/producers/create-producer.page'
 import { EditProducerPage } from './pages/producers/edit-producer.page'
+import { AuthGuard, PublicOnlyGuard } from './components/auth-guard'
+import { LoginPage } from './pages/auth/login.page'
 
 export function AppRoutes() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route element={<AppLayout />}>
-          <Route path="/" element={<DashboardPage />} />
-          <Route path="/producers" element={<ListProducersPage />} />
-          <Route path="/producers/new" element={<CreateProducerPage />} />
-          <Route path="/producers/:producerId" element={<EditProducerPage />} />
-          <Route path="/farms" element={<FarmsPage />} />
-          <Route path="/farms/new" element={<CreateFarmPage />} />
-          <Route path="/farms/:farmId" element={<EditFarmPage />} />
+        <Route element={<PublicOnlyGuard />}>
+          <Route path="/login" element={<LoginPage />} />
+        </Route>
+
+        <Route element={<AuthGuard />}>
+          <Route element={<AppLayout />}>
+            <Route path="/" element={<DashboardPage />} />
+            <Route path="/producers" element={<ListProducersPage />} />
+            <Route path="/producers/new" element={<CreateProducerPage />} />
+            <Route path="/producers/:producerId" element={<EditProducerPage />} />
+            <Route path="/farms" element={<FarmsPage />} />
+            <Route path="/farms/new" element={<CreateFarmPage />} />
+            <Route path="/farms/:farmId" element={<EditFarmPage />} />
+          </Route>
         </Route>
       </Routes>
     </BrowserRouter>
