@@ -1,3 +1,12 @@
+import { MoreHorizontal, Pencil } from 'lucide-react';
+import { Link } from 'react-router';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@components/ui/dropdown-menu';
+import { Button } from '@components/ui/button';
 import {
   Pagination,
   PaginationContent,
@@ -58,12 +67,20 @@ export function FarmsTable({ farms, page = 1, pageCount = 1, isFetching, onPageC
                 <TableHead>Área total</TableHead>
                 <TableHead>Agricultável</TableHead>
                 <TableHead>Vegetação</TableHead>
+                <TableHead className="w-12"><span className="sr-only">Ações</span></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {farms.map((farm) => (
                 <TableRow key={farm.id}>
-                  <TableCell className="font-medium">{farm.name}</TableCell>
+                  <TableCell className="font-medium">
+                    <Link
+                      className="hover:underline"
+                      to={`/farms/${farm.id}`}
+                    >
+                      {farm.name}
+                    </Link>
+                  </TableCell>
                   {hasOwner && (
                     <TableCell>{farm.owner?.name ?? farm.producerId}</TableCell>
                   )}
@@ -73,6 +90,30 @@ export function FarmsTable({ farms, page = 1, pageCount = 1, isFetching, onPageC
                   <TableCell>{formatArea(farm.totalArea)}</TableCell>
                   <TableCell>{formatArea(farm.arableArea)}</TableCell>
                   <TableCell>{formatArea(farm.vegetationArea)}</TableCell>
+                  <TableCell>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger
+                        render={
+                          <Button
+                            variant="ghost"
+                            size="icon-xs"
+                            className="mx-auto flex size-5"
+                            aria-label={`Ações de ${farm.name}`}
+                          />
+                        }
+                      >
+                        <MoreHorizontal />
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem
+                          render={<Link to={`/farms/${farm.id}`} />}
+                        >
+                          <Pencil />
+                          Editar
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>

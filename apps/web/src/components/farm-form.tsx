@@ -21,7 +21,7 @@ import { Input } from '@components/ui/input';
 import { Spinner } from '@components/ui/spinner';
 import { SaveIcon } from 'lucide-react';
 
-import type { CreateFarmApiArg } from '@store/api/api.generated';
+import type { CreateFarmApiArg, FarmResponse } from '@store/api/api.generated';
 import { useGetIbgeMunicipiosV1ByUfQuery } from '@store/brasil-api/api.generated';
 
 const farmFormSchema = z
@@ -70,20 +70,11 @@ const farmFormSchema = z
 type FarmFormValues = z.infer<typeof farmFormSchema>;
 
 type FarmFormProps = {
+  farm?: FarmResponse;
   producerId?: string;
   onSubmit: (body: CreateFarmApiArg['body']) => Promise<void>;
   onCancel?: () => void;
   isLoading?: boolean;
-};
-
-const defaultValues: FarmFormValues = {
-  name: '',
-  producerId: '',
-  city: '',
-  state: '',
-  totalArea: '',
-  arableArea: '',
-  vegetationArea: '',
 };
 
 function limitDecimalPlaces(value: string, decimalPlaces = 2) {
@@ -95,6 +86,7 @@ function limitDecimalPlaces(value: string, decimalPlaces = 2) {
 }
 
 export function FarmForm({
+  farm,
   producerId,
   onSubmit,
   onCancel,
@@ -103,7 +95,15 @@ export function FarmForm({
   const [cityOpen, setCityOpen] = useState(false);
   const form = useForm<FarmFormValues>({
     resolver: zodResolver(farmFormSchema),
-    defaultValues: { ...defaultValues, producerId: producerId ?? '' },
+    defaultValues: {
+      name: farm?.name ?? '',
+      producerId: farm?.producerId ?? producerId ?? '',
+      city: farm?.city ?? '',
+      state: farm?.state ?? '',
+      totalArea: farm ? String(farm.totalArea) : '',
+      arableArea: farm ? String(farm.arableArea) : '',
+      vegetationArea: farm ? String(farm.vegetationArea) : '',
+    },
   });
   const selectedState = form.watch('state');
   const municipalitiesQuery = useGetIbgeMunicipiosV1ByUfQuery(

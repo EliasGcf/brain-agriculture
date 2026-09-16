@@ -1,12 +1,17 @@
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
+import { MemoryRouter } from 'react-router'
 
 import { FarmsTable } from './farms-table'
 import { makeFarm } from '../../tests/mocks/data'
 
 describe('farms table', () => {
   it('should display farm summaries in a table', () => {
-    render(<FarmsTable farms={[makeFarm()]} />)
+    render(
+      <MemoryRouter>
+        <FarmsTable farms={[makeFarm()]} />
+      </MemoryRouter>,
+    )
 
     expect(screen.getByRole('table')).toBeInTheDocument()
     expect(screen.getByRole('columnheader', { name: 'Nome' })).toBeInTheDocument()
@@ -26,5 +31,23 @@ describe('farms table', () => {
 
     expect(screen.getByText('Nenhuma fazenda encontrada')).toBeInTheDocument()
     expect(screen.getByText('As fazendas cadastradas aparecerão nesta lista.')).toBeInTheDocument()
+  })
+
+  it('should provide a link and an edit action for a farm', () => {
+    const farm = makeFarm()
+
+    render(
+      <MemoryRouter>
+        <FarmsTable farms={[farm]} />
+      </MemoryRouter>,
+    )
+
+    expect(screen.getByRole('link', { name: farm.name })).toHaveAttribute(
+      'href',
+      `/farms/${farm.id}`,
+    )
+    fireEvent.click(screen.getByRole('button', { name: `Ações de ${farm.name}` }))
+
+    expect(screen.getByRole('menuitem', { name: 'Editar' })).toBeInTheDocument()
   })
 })

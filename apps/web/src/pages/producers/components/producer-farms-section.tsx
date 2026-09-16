@@ -19,7 +19,10 @@ type ProducerFarmsSectionProps = {
 
 export function ProducerFarmsSection({ producerId }: ProducerFarmsSectionProps) {
   const [isAddingFarm, setIsAddingFarm] = useState(false);
-  const listFarmsQuery = useListFarmsByProducerQuery({ producerId });
+  const listFarmsQuery = useListFarmsByProducerQuery(
+    { producerId },
+    { refetchOnMountOrArgChange: true },
+  );
   const [createFarm, createFarmState] = useCreateFarmMutation();
 
   async function handleCreateFarm(body: CreateFarmApiArg['body']) {
