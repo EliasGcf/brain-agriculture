@@ -32,7 +32,7 @@ export function setupSwagger(app: INestApplication, env: EnvService) {
 
   SwaggerModule.setup('docs', app, document);
 
-  if (env.get('NODE_ENV') === 'development') {
+  if (env.isDev) {
     fs.writeFile('./openapi.json', JSON.stringify(document, null, 2));
   }
 }
