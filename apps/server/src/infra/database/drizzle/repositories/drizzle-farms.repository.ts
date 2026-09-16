@@ -6,12 +6,13 @@ import { type DB, DRIZZLE } from '@infra/database/drizzle/drizzle.constants';
 import { DrizzleFarmMapper } from '@infra/database/drizzle/mappers/drizzle-farm.mapper';
 import { Farm } from '@modules/farms/domain/entities/farm';
 import { FarmsRepository } from '@modules/farms/domain/repositories/farms.repository';
+import { FarmsDashboardMetricsDto } from "@modules/metrics/application/dto/dashboard-metrics.dto";
 
 @Injectable()
 export class DrizzleFarmsRepository implements FarmsRepository {
   constructor(@Inject(DRIZZLE) public readonly db: DB) {}
 
-  async getDashboardMetrics() {
+  async getDashboardMetrics(): Promise<FarmsDashboardMetricsDto> {
     const normalizedCrop = sql`lower(trim(${schema.plantedCrops.name}))`;
 
     const [[summary], byState, byCrop] = await Promise.all([

@@ -34,7 +34,7 @@ describe('GetDashboardMetricsController (e2e)', () => {
 
   afterAll(() => app.close());
 
-  it('should be able to get dashboard metrics', async () => {
+  it('(GET) /metrics', async () => {
     const producer = await producerFactory.make();
     const farm = await farmFactory.make({
       producerId: producer.id.toString(),

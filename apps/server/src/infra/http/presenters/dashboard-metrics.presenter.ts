@@ -15,8 +15,10 @@ const schema = z.object({
   }),
 });
 
+class DashboardMetricsResponse extends createZodDto(schema) {}
+
 export class DashboardMetricsPresenter {
-  static Response = createZodDto(schema);
+  static Response = DashboardMetricsResponse;
 
   static toHTTP(metrics: DashboardMetricsDto) {
     return schema.parse(metrics);
