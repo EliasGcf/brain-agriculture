@@ -30,6 +30,7 @@ ENV NODE_ENV=production
 COPY --from=production-dependencies /app/node_modules /app/node_modules
 COPY --from=production-dependencies /app/apps/server/node_modules ./node_modules
 COPY --from=build /app/apps/server/dist ./dist
+COPY --from=build /app/apps/server/drizzle.config.ts ./drizzle.config.ts
 
 USER node
 EXPOSE 3333
