@@ -7,6 +7,7 @@ import {
   type CreateFarmApiArg,
 } from '@store/api/api.generated';
 import { FarmForm } from '@components/farm-form';
+import { HarvestsSection } from '@pages/farms/components/harvests-section';
 import { LoadingCard } from '@components/loading-card';
 import { RetryCard } from '@components/retry-card';
 
@@ -60,7 +61,6 @@ export function EditFarmPage() {
       />
     );
   }
-
   return (
     <div className="space-y-6">
       <div>
@@ -78,6 +78,7 @@ export function EditFarmPage() {
         isLoading={updateState.isLoading}
         onCancel={() => navigate('/farms')}
       />
+      <HarvestsSection farmId={farmId} />
     </div>
   );
 }

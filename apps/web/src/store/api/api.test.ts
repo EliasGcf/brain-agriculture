@@ -3,6 +3,7 @@ import { http, HttpResponse } from 'msw';
 import { api } from './api.generated';
 import { server } from '../../../tests/mocks/server';
 import { apiStore } from '../store';
+import { env } from "@env";
 
 describe('MSW API integration', () => {
   it('should be able to fetch producers through an RTK Query endpoint', async () => {
@@ -246,7 +247,7 @@ describe('MSW API integration', () => {
   });
 
   it('should be able to override a response for an individual test', async () => {
-    const baseUrl = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/+$/, '');
+    const baseUrl = (env.VITE_API_BASE_URL || '').replace(/\/+$/, '');
     server.use(
       http.get(`${baseUrl}/producers`, () =>
         HttpResponse.json({ items: [], total: 0 }),

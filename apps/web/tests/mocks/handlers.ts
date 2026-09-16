@@ -19,10 +19,11 @@ import {
   mockData,
   nextMockId,
 } from './data';
+import { env } from "../../src/env";
 
-const baseUrl = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/+$/, '');
+const baseUrl = (env.VITE_API_BASE_URL || '').replace(/\/+$/, '');
 const route = (path: string) => `${baseUrl}${path}`;
-const brasilApiBaseUrl = (import.meta.env.VITE_BRASIL_API_BASE_URL || 'https://brasilapi.com.br/api').replace(/\/+$/, '');
+const brasilApiBaseUrl = (env.VITE_BRASIL_API_BASE_URL).replace(/\/+$/, '');
 const brasilRoute = (path: string) => `${brasilApiBaseUrl}${path}`;
 
 const notFound = () => HttpResponse.json({ message: 'Not found' }, { status: 404 });

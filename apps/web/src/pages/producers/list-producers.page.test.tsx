@@ -6,8 +6,9 @@ import { ListProducersPage, PAGE_SIZE } from './list-producers.page'
 import { makeProducer, mockData } from '../../../tests/mocks/data'
 import { server } from '../../../tests/mocks/server'
 import { renderWithProviders } from '../../../tests/test-utils'
+import { env } from "@env"
 
-const baseUrl = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/+$/, '')
+const baseUrl = (env.VITE_API_BASE_URL || '').replace(/\/+$/, '')
 const producersUrl = `${baseUrl}/producers`
 
 function makePageRecords(prefix: string, count = PAGE_SIZE + 1) {

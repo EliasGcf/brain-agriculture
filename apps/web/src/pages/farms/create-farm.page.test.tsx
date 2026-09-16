@@ -1,9 +1,8 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach } from 'vitest'
 import { MemoryRouter, Route, Routes } from 'react-router'
-import { FarmsPage } from './list-farms.page'
-
 import { CreateFarmPage } from './create-farm.page'
+import { EditFarmPage } from './edit-farm.page'
 import { renderWithProviders } from '../../../tests/test-utils'
 
 describe('create farm page', () => {
@@ -21,12 +20,12 @@ describe('create farm page', () => {
     globalThis.ResizeObserver = originalResizeObserver
   })
 
-  it('should be able to save a farm and navigate back to the global list', async () => {
+  it('should be able to save a farm and navigate to its edit page', async () => {
     renderWithProviders(
       <MemoryRouter initialEntries={['/farms/new']}>
         <Routes>
           <Route path="/farms/new" element={<CreateFarmPage />} />
-          <Route path="/farms" element={<FarmsPage />} />
+          <Route path="/farms/:farmId" element={<EditFarmPage />} />
         </Routes>
       </MemoryRouter>,
     )
@@ -43,6 +42,6 @@ describe('create farm page', () => {
     fireEvent.change(screen.getByLabelText('Área de vegetação (ha)'), { target: { value: '20' } })
     fireEvent.click(screen.getByRole('button', { name: 'Salvar fazenda' }))
 
-    await waitFor(() => expect(screen.getByText('Fazendas')).toBeInTheDocument())
+    await waitFor(() => expect(screen.getByText('Fazenda Sol')).toBeInTheDocument())
   })
 })

@@ -6,8 +6,9 @@ import { CreateFarmPage } from './create-farm.page'
 import { FarmsPage } from './list-farms.page'
 import { renderWithProviders } from '../../../tests/test-utils'
 import { server } from '../../../tests/mocks/server'
+import { env } from "@env"
 
-const farmsUrl = `${(import.meta.env.VITE_API_BASE_URL || '').replace(/\/+$/, '')}/farms`
+const farmsUrl = `${(env.VITE_API_BASE_URL || '').replace(/\/+$/, '')}/farms`
 
 describe('farms page', () => {
   it('should be able to see farms returned by the global farms endpoint', async () => {

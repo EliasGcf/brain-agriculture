@@ -123,4 +123,11 @@ describe('farm form', () => {
     expect(await screen.findByRole('option', { name: /Ada Rural/ })).toBeInTheDocument()
   })
 
+  it('should not display harvest controls before the farm is saved', () => {
+    renderWithProviders(<FarmForm onSubmit={vi.fn()} onCancel={vi.fn()} />)
+
+    expect(screen.queryByRole('heading', { name: 'Safras' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Adicionar safra' })).not.toBeInTheDocument()
+  })
+
 })

@@ -10,8 +10,8 @@ export function CreateFarmPage() {
 
   async function handleSubmit(body: CreateFarmApiArg['body']) {
     try {
-      await createFarm({ body }).unwrap();
-      navigate('/farms');
+      const farm = await createFarm({ body }).unwrap();
+      navigate(`/farms/${farm.id}`);
     } catch {
       toast.error('Não foi possível cadastrar a fazenda.');
     }

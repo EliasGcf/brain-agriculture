@@ -5,8 +5,9 @@ import { describe, expect, it } from 'vitest'
 import { AppRoutes } from '../../routes'
 import { renderWithProviders } from '../../../tests/test-utils'
 import { server } from '../../../tests/mocks/server'
+import { env } from "@env"
 
-const baseUrl = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/+$/, '')
+const baseUrl = (env.VITE_API_BASE_URL || '').replace(/\/+$/, '')
 
 function renderCreateProducer() {
   window.history.pushState({}, '', '/producers/new')
