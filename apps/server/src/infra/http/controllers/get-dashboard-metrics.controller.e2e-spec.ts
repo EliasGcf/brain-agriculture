@@ -73,5 +73,17 @@ describe('GetDashboardMetricsController (e2e)', () => {
         (item: { crop: string }) => item.crop.toLowerCase() === crop.toLowerCase(),
       ),
     ).toEqual({ crop: expect.any(String), farms: 1 });
+    expect(response.body.hectaresByState).toEqual(
+      [...response.body.hectaresByState].sort(
+        (first: { state: string; hectares: number }, second: { state: string; hectares: number }) =>
+          second.hectares - first.hectares || first.state.localeCompare(second.state),
+      ),
+    );
+    expect(response.body.farmsByCrop).toEqual(
+      [...response.body.farmsByCrop].sort(
+        (first: { crop: string; farms: number }, second: { crop: string; farms: number }) =>
+          second.farms - first.farms || first.crop.localeCompare(second.crop),
+      ),
+    );
   });
 });

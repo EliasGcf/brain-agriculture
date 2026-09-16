@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { asc, countDistinct, eq, sql, sum } from 'drizzle-orm';
+import { asc, countDistinct, desc, eq, sql, sum } from 'drizzle-orm';
 
 import { schema } from '@infra/database/drizzle/schema';
 import { type DB, DRIZZLE } from '@infra/database/drizzle/drizzle.constants';
@@ -29,7 +29,7 @@ export class DrizzleFarmsRepository implements FarmsRepository {
         .select({ state: schema.farms.state, hectares: sum(schema.farms.totalArea) })
         .from(schema.farms)
         .groupBy(schema.farms.state)
-        .orderBy(asc(schema.farms.state)),
+        .orderBy(desc(sum(schema.farms.totalArea)), asc(schema.farms.state)),
       this.db
         .select({
           crop: sql<string>`min(trim(${schema.plantedCrops.name}))`,
@@ -39,7 +39,7 @@ export class DrizzleFarmsRepository implements FarmsRepository {
         .innerJoin(schema.harvests, eq(schema.harvests.id, schema.plantedCrops.harvestId))
         .innerJoin(schema.farms, eq(schema.farms.id, schema.harvests.farmId))
         .groupBy(normalizedCrop)
-        .orderBy(asc(normalizedCrop)),
+        .orderBy(desc(countDistinct(schema.farms.id)), asc(normalizedCrop)),
     ]);
 
     return {

@@ -1,4 +1,5 @@
-import { Legend, Pie, PieChart } from 'recharts';
+import { Pie, PieChart } from 'recharts';
+import type { TooltipValueType } from 'recharts';
 
 import {
   ChartContainer,
@@ -20,6 +21,68 @@ import { DashboardEmptyChart } from './dashboard-empty-chart';
 import { formatCount, formatNumber, formatPercentage } from '../dashboard-formatters';
 import type { DashboardData } from '../dashboard-data';
 
+type BreakdownDetail = { label: string; value: number };
+
+type OtherTooltipProps = React.ComponentProps<typeof ChartTooltipContent> & {
+  valueFormatter?: (value: TooltipValueType | undefined) => React.ReactNode;
+};
+
+export function DashboardOtherTooltip({ active, payload, valueFormatter, ...tooltipProps }: OtherTooltipProps) {
+  if (!active || !payload?.length) return null;
+
+  const item = payload[0];
+  const details = (item.payload as { details?: BreakdownDetail[] } | undefined)?.details;
+
+  if (!details?.length) {
+    return (
+      <ChartTooltipContent
+        {...tooltipProps}
+        active={active}
+        payload={payload}
+        valueFormatter={valueFormatter}
+      />
+    );
+  }
+
+  return (
+    <div className="grid min-w-40 gap-1.5 rounded-lg border border-border/50 bg-background px-2.5 py-1.5 text-xs shadow-xl">
+      <div className="font-medium">{item.name}</div>
+      <div className="font-mono font-medium text-foreground tabular-nums">
+        Total: {valueFormatter?.(item.value) ?? item.value}
+      </div>
+      <ul className="grid gap-1 border-t pt-1.5 text-muted-foreground">
+        {details.map((detail) => (
+          <li key={detail.label}>
+            {detail.label}: {valueFormatter?.(detail.value) ?? detail.value}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function selectTopFive<T>(
+  items: T[],
+  getLabel: (item: T) => string,
+  getValue: (item: T) => number,
+  createOther: (value: number, details: BreakdownDetail[]) => T & { details: BreakdownDetail[] },
+) {
+  const remainingItems = items.slice(5);
+
+  return {
+    visibleItems: remainingItems.length
+      ? [
+          ...items.slice(0, 5),
+          createOther(
+            remainingItems.reduce((total, item) => total + getValue(item), 0),
+            remainingItems.map((item) => ({ label: getLabel(item), value: getValue(item) })),
+          ),
+        ]
+      : items,
+    remainingItems,
+  };
+}
+
 const landUseChartConfig = {
   arableArea: { label: 'Área agricultável', color: 'var(--chart-1)' },
   vegetationArea: { label: 'Vegetação', color: 'var(--chart-3)' },
@@ -40,18 +103,30 @@ const cropColors = [
 ];
 
 export function DashboardCharts({ data }: { data: DashboardData }) {
-  const stateTotal = data.hectaresByState.reduce((sum, item) => sum + item.hectares, 0);
+  const { visibleItems: stateData } = selectTopFive(
+    data.hectaresByState,
+    (item) => item.state,
+    (item) => item.hectares,
+    (hectares, details) => ({ state: 'Outros estados', hectares, details }),
+  );
+  const { visibleItems: cropData } = selectTopFive(
+    data.farmsByCrop,
+    (item) => item.crop,
+    (item) => item.farms,
+    (farms, details) => ({ crop: 'Outras culturas', farms, details }),
+  );
+  const stateTotal = stateData.reduce((sum, item) => sum + item.hectares, 0);
   const stateChartConfig = Object.fromEntries(
-    data.hectaresByState.map((item) => [item.state, { label: item.state }]),
+    stateData.map((item) => [item.state, { label: item.state }]),
   ) as ChartConfig;
   const cropChartConfig = Object.fromEntries(
-    data.farmsByCrop.map((item) => [item.crop, { label: item.crop }]),
+    cropData.map((item) => [item.crop, { label: item.crop }]),
   ) as ChartConfig;
-  const stateChartData = data.hectaresByState.map((item, index) => ({
+  const stateChartData = stateData.map((item, index) => ({
     ...item,
     fill: stateColors[index % stateColors.length],
   }));
-  const cropChartData = data.farmsByCrop.map((item, index) => ({
+  const cropChartData = cropData.map((item, index) => ({
     ...item,
     fill: cropColors[index % cropColors.length],
   }));
@@ -72,11 +147,11 @@ export function DashboardCharts({ data }: { data: DashboardData }) {
           <CardDescription>Área total das fazendas agrupada por estado.</CardDescription>
         </CardHeader>
         <CardContent>
-          {data.hectaresByState.length ? (
+          {stateData.length ? (
             <>
               <ChartContainer
                 config={stateChartConfig}
-                className="h-64 w-full"
+                className="h-64 w-full [&_.recharts-pie-label-text]:fill-foreground"
                 role="img"
                 aria-label="Gráfico de pizza de hectares por estado"
               >
@@ -84,7 +159,7 @@ export function DashboardCharts({ data }: { data: DashboardData }) {
                   <ChartTooltip
                     isAnimationActive={false}
                     content={
-                      <ChartTooltipContent
+                      <DashboardOtherTooltip
                         hideLabel
                         nameKey="state"
                         valueFormatter={(value) => `${formatNumber(Number(value))} ha`}
@@ -94,16 +169,17 @@ export function DashboardCharts({ data }: { data: DashboardData }) {
                   <Pie
                     data={stateChartData}
                     dataKey="hectares"
+                    isAnimationActive={false}
+                    label={({ value }) => formatNumber(Number(value))}
                     nameKey="state"
                     outerRadius={86}
                   >
                   </Pie>
-                  <Legend />
                 </PieChart>
               </ChartContainer>
               <DashboardChartAlternative>
                 <ul>
-                  {data.hectaresByState.map((item) => (
+                  {stateData.map((item) => (
                     <li key={item.state}>
                       {item.state}: {formatNumber(item.hectares)} ha (
                       {formatPercentage(item.hectares, stateTotal)}%)
@@ -126,11 +202,11 @@ export function DashboardCharts({ data }: { data: DashboardData }) {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {data.farmsByCrop.length ? (
+          {cropData.length ? (
             <>
               <ChartContainer
                 config={cropChartConfig}
-                className="h-64 w-full"
+                className="h-64 w-full [&_.recharts-pie-label-text]:fill-foreground"
                 role="img"
                 aria-label="Gráfico de pizza de fazendas por cultura"
               >
@@ -138,28 +214,27 @@ export function DashboardCharts({ data }: { data: DashboardData }) {
                   <ChartTooltip
                     isAnimationActive={false}
                     content={
-                      <ChartTooltipContent
+                      <DashboardOtherTooltip
                         hideLabel
                         nameKey="crop"
-                        valueFormatter={(value) =>
-                          `${formatCount(Number(value))} fazendas`
-                        }
+                        valueFormatter={(value) => `${formatCount(Number(value))} fazendas`}
                       />
                     }
                   />
                   <Pie
                     data={cropChartData}
                     dataKey="farms"
+                    isAnimationActive={false}
+                    label={({ value }) => formatCount(Number(value))}
                     nameKey="crop"
                     outerRadius={86}
                   >
                   </Pie>
-                  <Legend />
                 </PieChart>
               </ChartContainer>
               <DashboardChartAlternative>
                 <ul>
-                  {data.farmsByCrop.map((item) => (
+                  {cropData.map((item) => (
                     <li key={item.crop}>
                       {item.crop}: {formatCount(item.farms)} fazendas (
                       {formatPercentage(item.farms, data.farmCount)}% do total de
