@@ -1,5 +1,6 @@
 import { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
+import cookieParser from 'cookie-parser';
 import request from 'supertest';
 import { App } from 'supertest/types';
 
@@ -7,9 +8,11 @@ import { DatabaseModule } from '@infra/database/database.module';
 import { HttpModule } from '@infra/http/http.module';
 import { ProducersRepository } from '@modules/producers/domain/repositories/producers.repository';
 import { ProducerFactory } from '@test/factories/make-producer.factory';
+import { authenticate } from '@test/e2e-auth';
 
 describe('DeleteProducerController (e2e)', () => {
   let app: INestApplication<App>;
+  let accessToken: string;
   let producerFactory: ProducerFactory;
   let producersRepository: ProducersRepository;
 
@@ -20,9 +23,11 @@ describe('DeleteProducerController (e2e)', () => {
     }).compile();
 
     app = moduleRef.createNestApplication();
+    app.use(cookieParser());
     producerFactory = moduleRef.get<ProducerFactory>(ProducerFactory);
     producersRepository = moduleRef.get<ProducersRepository>(ProducersRepository);
     await app.init();
+    accessToken = await authenticate(app);
   });
 
   afterAll(() => app.close());
@@ -30,7 +35,10 @@ describe('DeleteProducerController (e2e)', () => {
   it('(DELETE) /producers/:id', async () => {
     const producer = await producerFactory.make();
 
-    await request(app.getHttpServer()).delete(`/producers/${producer.id}`).expect(204);
+    await request(app.getHttpServer())
+      .delete(`/producers/${producer.id}`)
+      .set('Cookie', accessToken)
+      .expect(204);
     await expect(
       producersRepository.findById(producer.id.toString()),
     ).resolves.toBeNull();

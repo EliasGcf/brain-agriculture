@@ -61,6 +61,7 @@ describe('ListProducersController (e2e)', () => {
 
     const response = await request(app.getHttpServer())
       .get('/producers')
+      .set('Cookie', accessToken)
       .query({ search: producer.name });
 
     expect(response.body.items).toEqual([
