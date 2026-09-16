@@ -6,19 +6,20 @@ import { NativeLogger } from 'nestjs-pino';
 import { AppModule } from './app.module';
 import { EnvService } from '@infra/env/env.service';
 import { setupSwagger } from '@infra/swagger';
+import { setupCors } from "@infra/cors";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { bufferLogs: true });
+  const env = app.get(EnvService);
 
   const logger = app.get(NativeLogger);
   app.useLogger(logger);
 
-  app.enableCors({ origin: true, credentials: true });
+  setupCors(app, env);
   app.enableShutdownHooks();
   app.use(cookieParser());
   app.useGlobalPipes(new StandardSchemaValidationPipe());
 
-  const env = app.get(EnvService);
 
   setupSwagger(app, env);
 
