@@ -793,6 +793,41 @@
           "Planted Crops"
         ]
       }
+    },
+    "/metrics": {
+      "get": {
+        "operationId": "GetDashboardMetrics",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardMetricsResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Metrics"
+        ]
+      }
+    },
+    "/health": {
+      "get": {
+        "operationId": "Health",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Health"
+        ]
+      }
     }
   },
   "info": {
@@ -998,6 +1033,84 @@
           "name",
           "harvestId",
           "createdAt"
+        ]
+      },
+      "DashboardMetricsResponse": {
+        "type": "object",
+        "properties": {
+          "farmCount": {
+            "type": "number"
+          },
+          "producerCount": {
+            "type": "number"
+          },
+          "totalHectares": {
+            "type": "number"
+          },
+          "hectaresByState": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "state": {
+                  "type": "string"
+                },
+                "hectares": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "state",
+                "hectares"
+              ]
+            }
+          },
+          "farmsByCrop": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "crop": {
+                  "type": "string"
+                },
+                "farms": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "crop",
+                "farms"
+              ]
+            }
+          },
+          "landUse": {
+            "type": "object",
+            "properties": {
+              "arableArea": {
+                "type": "number"
+              },
+              "vegetationArea": {
+                "type": "number"
+              },
+              "otherUses": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "arableArea",
+              "vegetationArea",
+              "otherUses"
+            ],
+            "x-nestjs_zod-self-required": true
+          }
+        },
+        "required": [
+          "farmCount",
+          "producerCount",
+          "totalHectares",
+          "hectaresByState",
+          "farmsByCrop",
+          "landUse"
         ]
       }
     }
