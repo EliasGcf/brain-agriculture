@@ -1,4 +1,4 @@
-# fly.toml app configuration file generated for brain-agriculture-as1r3a on 2026-09-16T03:44:04Z
+# fly.toml app configuration file generated for brain-agriculture-as1r3a on 2026-09-16T18:23:15Z
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
@@ -11,22 +11,17 @@ primary_region = 'iad'
 
 [deploy]
   strategy = 'bluegreen'
+  release_command = 'npx drizzle-kit@0.31.10 migrate'
 
 [http_service]
   internal_port = 3333
   force_https = true
-  auto_stop_machines = 'stop'
+  auto_stop_machines = true
   auto_start_machines = true
   min_machines_running = 0
   processes = ['app']
-
-  [[http_service.checks]]
-    interval = '30s'
-    timeout = '5s'
-    grace_period = '10s'
-    method = 'GET'
-    path = '/health'
+  checks = [{ grace_period = '10s', interval = '30s', method = 'GET', path = '/health', timeout = '5s' }]
 
 [[vm]]
-  size = "shared-cpu-1x"
-  memory = "256mb"
+  size = 'shared-cpu-1x'
+  memory = '256mb'
