@@ -30,7 +30,7 @@ class CustomAggregate extends AggregateRoot<z.ZodNull> {
 
 describe('domain events', () => {
   it('should be able to dispatch and listen to events', async () => {
-    const callbackSpy = jest.fn();
+    const callbackSpy = vi.fn();
 
     // Register a subscriber listening for the "created response" event.
     DomainEvents.register(callbackSpy, CustomAggregateCreated.name);

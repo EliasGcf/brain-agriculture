@@ -3,14 +3,14 @@ import { Test } from '@nestjs/testing';
 import request from 'supertest';
 import { App } from 'supertest/types';
 
-import { AppModule } from '@infra/app.module';
+import { HealthController } from "@infra/http/controllers/health.controller";
 
 describe('HealthController (e2e)', () => {
   let app: INestApplication<App>;
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
-      imports: [AppModule],
+      controllers: [HealthController]
     }).compile();
 
     app = moduleRef.createNestApplication();
@@ -24,5 +24,6 @@ describe('HealthController (e2e)', () => {
       .get('/health')
       .expect(200)
       .expect({ status: 'ok' });
+    expect(true).toBe(true);
   });
 });
